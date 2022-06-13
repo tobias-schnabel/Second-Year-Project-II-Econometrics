@@ -31,45 +31,91 @@ stview(dfSummary(dat))
 #(2+7)mod(4)=1 -> cluster 1
 wdat = dat[OriginCluster == "Cluster1",]
 wdat = wdat[ClusterDistance > 20,][ClusterDistance < 400,]
-stview(dfSummary(wdat))
+# stview(dfSummary(wdat))
 
 #I guess he wants the 4 most frequent destination clusters?
 destlist = c("Cluster15", "Cluster186", "Cluster208", "Cluster12")
 
-lanedat = wdat[DestinationCluster %in% destlist,][, date := as.Date(`TR Creation Date/Time`)]
-stview(dfSummary(lanedat))
+lanedat = wdat[DestinationCluster %in% destlist,
+               ][, date := as.Date(`TR Creation Date/Time`)]
+# stview(dfSummary(lanedat))
 
 
 #aggregate:
-tsdat = lanedat[, .(sum(`TR Gross Weight (KG)`), sum(`Nb of Ship Units`), 
-                      sum(`TR Gross Volume (M3)`)), by = date]
-stview(dfSummary(tsdat))
-colnames(tsdat) = c("Date", "Gross Weight in KG", "Nb of Ship Units", "Gross Volume")
+tsdat = lanedat[, .(sum(`TR Gross Weight (KG)`), sum(`TR Gross Volume (M3)`), 
+                    sum(`Nb of Ship Units`), Number = .N ), by = date]
+# stview(dfSummary(tsdat))
+colnames(tsdat) = c("Date", "Gross Weight in KG",  "Gross Volume", "Nb of Ship Units",
+                    "Number of Shipments")
 #extend full date range:
-tsdat = as.data.table(tsdat %>% complete(Date = seq.Date((min(Date)-1), max(Date), by="day")))
+tsdat = as.data.table(tsdat %>% 
+                        complete(Date = seq.Date((min(Date)-1), max(Date), by="day")))
+
+
+
+markoutliers = function(x){
+  d = tsdat #make copy
+  colnames(d) = c("Date", 'W', 'V', 'N', "Num") #simplify
+  d[is.na(d),] <- 0 #replace NA values with 0
+  
+  #generate boolean columns that show True if the value for Weight, N, 
+  #Volumne is more than x standard deviations away from its mean (outliers)
+  #make dummy column that shows 1 if any of the metrics show an outlier in that row, 0 else
+  #rename and drop boolean cols
+  d = d[, WFlag := (W > x * sd(W) + mean(W))
+    ][, NFlag := (N > x * sd(N) + mean(N))
+      ][, VFlag := (V > x * sd(V) + mean(V))
+        ][, OUT := fifelse((WFlag | NFlag | VFlag), 1, 0)
+          ][, .(Date, Weight = W,  Volume = V, Nb = N, Number = Num, Outlier = OUT)]
+  return(d)
+}
+
 #make xts object
-seriesdat = as.xts.data.table(tsdat)
+dat = as.xts.data.table(markoutliers(3))
+
 #extract weekdays
-seriesdat = seriesdat[.indexwday(seriesdat) %in% 1:5]
-#replace missing values with 0:
-seriesdat = na.fill(seriesdat, 0)
+seriesdat = dat[.indexwday(dat) %in% 1:5]
+
+stview(dfSummary(seriesdat))
 
 #plot
 plot.xts(seriesdat, multi.panel = T, yaxis.same = F)
 
-#detect outliers
-v1 = tsoutliers(seriesdat$`Gross Weight in KG`)$index
-v2 = tsoutliers(seriesdat$`Nb of Ship Units`)$index
-v3 = tsoutliers(seriesdat$`Gross Volume`)$index
+#make copy of data with outliers dropped
+copy = markoutliers(3)
+stat = as.xts.data.table(copy[Outlier == 0])
+plot.xts(stat, multi.panel = T, yaxis.same = F) 
 
-v4 = union(v1, v2)
-outliers.index = union(v4, v3)
+copy2 = markoutliers(2)
+stat2 = as.xts.data.table(copy[Outlier == 0, 1:5])
+stat2$mw = mean(stat2$Weight)
+stat2$mnb = mean(stat2$Nb)
+stat2$mv = mean(stat2$Volume)
+stat2$mn = mean(stat2$Number)
 
-#create dummy
-seriesdat$outlier = 0
-for (i in outliers.index) {
-  seriesdat$outlier[index(seriesdat)[i]] = 1 
+plot.xts(stat2[, 1:4], multi.panel = T, yaxis.same = F)
+lines(stat2[, "mw"], on=1, lty = "dashed")
+lines(stat2[, "mv"], on=2, lty = "dashed")
+lines(stat2[, "mnb"], on=3, lty = "dashed")
+lines(stat2[, "mn"], on=4, lty = "dashed")
+
+
+{
+  #detect outliers using package function
+  # v1 = tsoutliers(seriesdat$`Gross Weight in KG`)$index
+  # v2 = tsoutliers(seriesdat$`Nb of Ship Units`)$index
+  # v3 = tsoutliers(seriesdat$`Gross Volume`)$index
+  # 
+  # v4 = union(v1, v2)
+  # outliers.index = union(v4, v3)
+  # 
+  # #create dummy
+  # seriesdat$outlier = 0
+  # for (i in outliers.index) {
+  #   seriesdat$outlier[index(seriesdat)[i]] = 1 
+  # } 
 }
 
-stview(dfSummary(seriesdat))
+
+
 
