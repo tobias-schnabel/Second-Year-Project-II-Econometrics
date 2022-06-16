@@ -100,22 +100,6 @@ lines(stat2[, "mnb"], on=3, lty = "dashed")
 lines(stat2[, "mn"], on=4, lty = "dashed")
 
 
-{
-  #detect outliers using package function
-  # v1 = tsoutliers(seriesdat$`Gross Weight in KG`)$index
-  # v2 = tsoutliers(seriesdat$`Nb of Ship Units`)$index
-  # v3 = tsoutliers(seriesdat$`Gross Volume`)$index
-  # 
-  # v4 = union(v1, v2)
-  # outliers.index = union(v4, v3)
-  # 
-  # #create dummy
-  # seriesdat$outlier = 0
-  # for (i in outliers.index) {
-  #   seriesdat$outlier[index(seriesdat)[i]] = 1 
-  # } 
-}
-
 
 
 
