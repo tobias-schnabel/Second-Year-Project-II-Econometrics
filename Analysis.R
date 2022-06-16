@@ -19,7 +19,7 @@ if (any(installed_packages == FALSE)) {
 invisible(lapply(packages, library, character.only = TRUE))
 rm(installed_packages)
 
-Paths = c("/Users/ts/Git/Second-Year-Project-II", "#path obbe here")
+Paths = c("/Users/ts/Git/Second-Year-Project-II-Econometrics", "#path obbe here")
 names(Paths) = c("ts", "#Sys.info()[7] result for obbe")
 setwd(Paths[Sys.info()[7]])
 
