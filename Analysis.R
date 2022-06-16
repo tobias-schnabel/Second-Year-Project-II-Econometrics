@@ -99,7 +99,21 @@ lines(stat2[, "mv"], on=2, lty = "dashed")
 lines(stat2[, "mnb"], on=3, lty = "dashed")
 lines(stat2[, "mn"], on=4, lty = "dashed")
 
+#make prettier graphs
+tidydat = as_tibble(copy2) %>% pivot_longer(
+  cols = !c(Date, Outlier), 
+  names_to = "Variable",
+  values_to = "Value")
 
+gmean = tidydat %>% 
+  group_by(Variable) %>% 
+  summarise(MN = mean(Value))
 
-
+#stationarity plot
+statplot = ggplot(data = tidydat, aes(x = Date, y = Value, color = Variable)) +
+  geom_line() + 
+  geom_hline(data = gmean, aes(yintercept = MN), lty = "dashed") +
+  facet_wrap(nrow = 4, vars(Variable), scales = "free") +
+  scale_color_tableau() + theme_minimal()
+statplot
 
