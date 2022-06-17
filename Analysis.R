@@ -3,7 +3,7 @@
 rm(list = ls(all = TRUE)) ###CLEAR ALL
 # Package names
 packages <- c("data.table", "dplyr", "zoo", "tidyr", "ggplot2", "ggthemes", "scales", 
-              "strucchange", "readxl", "summarytools", 
+              "strucchange", "readxl", "summarytools", "greybox",
               "skedastic", "tidyverse", "xtable", "knitr", 
               "stargazer", "patchwork", "remotes", "broom",
               "purrr", "xts", "forecast")
@@ -25,7 +25,7 @@ setwd(Paths[Sys.info()[7]])
 
 ##import data
 dat = as.data.table(read_excel('Data.xlsx')) 
-stview(dfSummary(dat))
+#stview(dfSummary(dat))
 
 ## Task 1
 #(2+7)mod(4)=1 -> cluster 1
@@ -111,7 +111,7 @@ gmean = tidydat %>%
   group_by(Variable) %>% 
   summarise(MN = mean(Value))
 
-#stationarity plot
+#2.1: stationarity plot
 statplot = ggplot(data = tidydat, aes(x = Date, y = Value, color = Variable)) +
   geom_line() + 
   geom_hline(data = gmean, aes(yintercept = MN), lty = "dashed") +
@@ -119,3 +119,34 @@ statplot = ggplot(data = tidydat, aes(x = Date, y = Value, color = Variable)) +
   scale_color_tableau() + theme_minimal()
 statplot
 
+#2.2: reg
+#make dummies for weekdays
+seriesdat$monday = 0
+seriesdat$tuesday = 0
+seriesdat$wednesday = 0
+seriesdat$thursday = 0
+seriesdat$friday = 0
+
+seriesdat$monday[.indexwday(seriesdat) == 1] = 1
+seriesdat$tuesday[.indexwday(seriesdat) == 2] = 1
+seriesdat$wednesday[.indexwday(seriesdat) == 3] = 1
+seriesdat$thursday[.indexwday(seriesdat) == 4] = 1
+seriesdat$friday[.indexwday(seriesdat) == 5] = 1
+
+head(seriesdat)
+#reg eqs
+model1 = Weight ~ tuesday + wednesday + thursday + friday + Outlier
+model2 = Volume ~ tuesday + wednesday + thursday + friday + Outlier
+model3 = Nb ~ tuesday + wednesday + thursday + friday + Outlier
+
+#estimate
+reg1 = lm(model1, seriesdat)
+reg2 = lm(model2, seriesdat)
+reg3 = lm(model3, seriedat)
+
+#show results
+summary(reg1)
+summary(reg2)
+summary(reg3)
+
+#2.3: residuals + acf/pacf
