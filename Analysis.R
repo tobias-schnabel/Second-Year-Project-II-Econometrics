@@ -19,8 +19,8 @@ if (any(installed_packages == FALSE)) {
 invisible(lapply(packages, library, character.only = TRUE))
 rm(installed_packages)
 
-Paths = c("/Users/ts/Git/Second-Year-Project-II-Econometrics", "#path obbe here")
-names(Paths) = c("ts", "#Sys.info()[7] result for obbe")
+Paths = c("/Users/ts/Git/Second-Year-Project-II-Econometrics", "C:/Users/obbep/Documents/R/Second-Year-Project-II-Econometrics/")
+names(Paths) = c("ts", "obbep")
 setwd(Paths[Sys.info()[7]])
 
 ##import data
