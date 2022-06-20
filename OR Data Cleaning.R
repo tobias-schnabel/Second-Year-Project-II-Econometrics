@@ -60,10 +60,7 @@ datelist1 = head(unique(export1$Date), 5)
 #subset
 export1 = export1 %>% 
   filter(Date %in% datelist1) %>%
-<<<<<<< HEAD
   distinct(SLC, Date, .keep_all = T) %>% 
-=======
->>>>>>> beb35fdd1be08e5c96c6efb61ba64ab69f569d0e
   select(-c(5,7,8,9,14,15,16,17,18,19))
 
 View(export1)
@@ -78,20 +75,15 @@ datelist2 = head(unique(export2$Date), 5)
 #subset
 export2 = export2 %>% 
   filter(Date %in% datelist2) %>%
-<<<<<<< HEAD
   distinct(SLC, Date, .keep_all = T) %>% 
-=======
->>>>>>> beb35fdd1be08e5c96c6efb61ba64ab69f569d0e
   select(-c(5,7,8,9,14,15,16,17,18,19))
 #combine
 
 export = export1 %>%
-<<<<<<< HEAD
   bind_rows(export2) %>% 
   relocate(SLC, .after = Date)
-=======
-  bind_rows(export2)
->>>>>>> beb35fdd1be08e5c96c6efb61ba64ab69f569d0e
+  
+
 
 SLC = export$SLC
 SLC = sub(" .*", "", SLC)
