@@ -100,6 +100,20 @@ lines(stat2[, "mnb"], on=3, lty = "dashed")
 lines(stat2[, "mn"], on=4, lty = "dashed")
 
 
+##OR data cleaning
+#location to cluster
+#issue 1: shipment already at destination
 
+#L,M,N,O -> if same, shipment is already at cluster (drop)
+ordat = as.data.table(read_excel('Data.xlsx'))
+stview(dfSummary(ordat))
 
+#drop Lat-Long duplicates
+orwdat = ordat[OriginClusterLat != OriginLat][OriginClusterLong != OriginLong]
+
+#drop shipments over 22 tons
+orwdat = orwdat[`TR Gross Weight (KG)` <= 20000][`TR Gross Volume (M3)` <= 82]
+#sort on origin cluster and PU Date
+setorder(orwdat, OriginCluster, -`TR Pickup - Event Day`, na.last = TRUE)
+stview(dfSummary(orwdat))
 
