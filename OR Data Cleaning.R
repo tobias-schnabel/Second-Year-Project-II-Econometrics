@@ -45,14 +45,14 @@ orex = as_tibble(orwdat) %>%
   rename(SLC = `TR Source Location Code`) %>% 
   rename(OrigID = OriginFull) %>% 
   relocate(c(Date, Weight, Nb, Volume, SLC)) %>% 
-  add_count(Date, OrigID, name = "NumUniquePerDay") %>% 
-  relocate(NumUniquePerDay, .after = Volume ) %>% 
-  arrange(desc(NumUniquePerDay))
+  add_count(Date, name = "NumPerDay") %>% 
+  relocate(NumPerDay, .after = Volume ) %>% 
+  arrange(desc(NumPerDay))
 
 #grab more than 20
-export1 = orex %>% filter(NumUniquePerDay > 19) %>% 
-  filter(NumUniquePerDay < 30) %>% 
-  arrange(desc(NumUniquePerDay), Date)
+export1 = orex %>% filter(NumPerDay > 19) %>% 
+  filter(NumPerDay < 30) %>% 
+  arrange(desc(NumPerDay), Date)
 
 #get dates
 datelist1 = head(unique(export1$Date), 5)
@@ -60,28 +60,35 @@ datelist1 = head(unique(export1$Date), 5)
 #subset
 export1 = export1 %>% 
   filter(Date %in% datelist1) %>%
-  select(-c(5,6,7,8,9,14,15,16,17,18,19))
+  select(-c(5,7,8,9,14,15,16,17,18,19))
 
 View(export1)
 
 #grab more than 30
-export2 = orex %>% filter(NumUniquePerDay > 30) %>%
-  arrange(desc(NumUniquePerDay), Date)
+export2 = orex %>% filter(NumPerDay > 30) %>%
+  arrange(desc(NumPerDay), Date)
 
 
-datelist2 = head(unique(export1$Date), 5)
+datelist2 = head(unique(export2$Date), 5)
 
 #subset
 export2 = export2 %>% 
   filter(Date %in% datelist2) %>%
-  select(-c(5,6,7,8,9,14,15,16,17,18,19))
+  select(-c(5,7,8,9,14,15,16,17,18,19))
 #combine
 
 export = export1 %>%
   bind_rows(export2)
+
+SLC = export$SLC
+SLC = sub(" .*", "", SLC)
+SLC = sub("T011.", "", SLC)
+
+export$SLC = SLC
+
   
 View(export)
 
 #export to txt
-write.table(export, file = "Data.txt", sep = "\t", 
+write.table(export, file = "Data.txt", sep = " ", 
             row.names = F, col.names = F)
