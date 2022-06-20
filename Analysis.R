@@ -37,8 +37,9 @@ wdat = wdat[ClusterDistance > 20,][ClusterDistance < 400,]
 destlist = c("Cluster15", "Cluster186", "Cluster208", "Cluster12")
 
 lanedat = wdat[DestinationCluster %in% destlist,
-               ][, date := as.Date(`TR Creation Date/Time`)]
+               ][, date := as.Date(PUDate)]
 # stview(dfSummary(lanedat))
+#before used `TR Creation Date/Time`
 
 
 #aggregate:
@@ -211,20 +212,4 @@ acp = ggarrange(acf1, pacf1, acf2, pacf2, acf3, pacf3, nrow = 3, ncol = 2)
 annotate_figure(acp, bottom = text_grob("Blue Lines denote 95% Confidence Intervals", hjust = 1, x = 1))
 
 
-##OR data cleaning
-#location to cluster
-#issue 1: shipment already at destination
-
-#L,M,N,O -> if same, shipment is already at cluster (drop)
-ordat = as.data.table(read_excel('Data.xlsx'))
-stview(dfSummary(ordat))
-
-#drop Lat-Long duplicates
-orwdat = ordat[OriginClusterLat != OriginLat][OriginClusterLong != OriginLong]
-
-#drop shipments over 22 tons
-orwdat = orwdat[`TR Gross Weight (KG)` <= 20000][`TR Gross Volume (M3)` <= 82]
-#sort on origin cluster and PU Date
-setorder(orwdat, OriginCluster, -`TR Pickup - Event Day`, na.last = TRUE)
-stview(dfSummary(orwdat))
 
