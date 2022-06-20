@@ -3,7 +3,7 @@
 rm(list = ls(all = TRUE)) ###CLEAR ALL
 # Package names
 packages <- c("data.table", "dplyr", "zoo", "tidyr", "ggplot2", "ggthemes", "scales", 
-              "strucchange", "readxl", "summarytools", 
+              "strucchange", "readxl", "summarytools", "greybox", "ggpubr",
               "skedastic", "tidyverse", "xtable", "knitr", 
               "stargazer", "patchwork", "remotes", "broom",
               "purrr", "xts", "forecast")
@@ -19,13 +19,13 @@ if (any(installed_packages == FALSE)) {
 invisible(lapply(packages, library, character.only = TRUE))
 rm(installed_packages)
 
-Paths = c("/Users/ts/Git/Second-Year-Project-II", "#path obbe here")
+Paths = c("/Users/ts/Git/Second-Year-Project-II-Econometrics", "#path obbe here")
 names(Paths) = c("ts", "#Sys.info()[7] result for obbe")
 setwd(Paths[Sys.info()[7]])
 
 ##import data
 dat = as.data.table(read_excel('Data.xlsx')) 
-stview(dfSummary(dat))
+#stview(dfSummary(dat))
 
 ## Task 1
 #(2+7)mod(4)=1 -> cluster 1
@@ -99,6 +99,7 @@ lines(stat2[, "mv"], on=2, lty = "dashed")
 lines(stat2[, "mnb"], on=3, lty = "dashed")
 lines(stat2[, "mn"], on=4, lty = "dashed")
 
+<<<<<<< HEAD
 
 ##OR data cleaning
 #location to cluster
@@ -116,4 +117,116 @@ orwdat = orwdat[`TR Gross Weight (KG)` <= 20000][`TR Gross Volume (M3)` <= 82]
 #sort on origin cluster and PU Date
 setorder(orwdat, OriginCluster, -`TR Pickup - Event Day`, na.last = TRUE)
 stview(dfSummary(orwdat))
+=======
+#make prettier graphs
+tidydat = as_tibble(copy2) %>% 
+  rename(Ndistinct = Number) %>% 
+  rename(Number = Nb) %>% 
+  pivot_longer(cols = !c(Date, Outlier, Ndistinct), 
+  names_to = "Variable",
+  values_to = "Value")
+
+gmean = tidydat %>% 
+  group_by(Variable) %>% 
+  summarise(MN = mean(Value))
+
+#2.1: stationarity plot
+statplot = ggplot(data = tidydat, aes(x = Date, y = Value, color = Variable)) +
+  geom_line() + 
+  geom_hline(data = gmean, aes(yintercept = MN), lty = "dashed") +
+  facet_wrap(nrow = 3, vars(Variable), scales = "free") +
+  scale_color_tableau() + theme_minimal()
+statplot
+
+#2.2: reg
+#make dummies for weekdays
+seriesdat$monday = 0
+seriesdat$tuesday = 0
+seriesdat$wednesday = 0
+seriesdat$thursday = 0
+seriesdat$friday = 0
+
+seriesdat$monday[.indexwday(seriesdat) == 1] = 1
+seriesdat$tuesday[.indexwday(seriesdat) == 2] = 1
+seriesdat$wednesday[.indexwday(seriesdat) == 3] = 1
+seriesdat$thursday[.indexwday(seriesdat) == 4] = 1
+seriesdat$friday[.indexwday(seriesdat) == 5] = 1
+
+head(seriesdat)
+#reg eqs
+model1 = Weight ~ tuesday + wednesday + thursday + friday + Outlier
+model2 = Volume ~ tuesday + wednesday + thursday + friday + Outlier
+model3 = Nb ~ tuesday + wednesday + thursday + friday + Outlier
+
+#estimate
+reg1 = lm(model1, seriesdat)
+reg2 = lm(model2, seriesdat)
+reg3 = lm(model3, seriesdat)
+
+#show results
+summary(reg1)
+summary(reg2)
+summary(reg3)
+
+#2.3: residuals + acf/pacf
+#ACF/PACF plots
+acf1 = ggAcf(reg1$residuals, lag.max = 14, color = "red") + 
+  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
+          plot.title = element_text(hjust = 0.5),
+          legend.position="bottom",
+          panel.grid.major.y = NULL,
+          panel.grid.major.x = NULL,
+          panel.background = element_rect(fill = "white")) +
+  ggtitle(as.character(model1)[2]) 
+
+pacf1 = ggPacf(reg1$residuals, lag.max = 14, color = "red") + 
+  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
+        plot.title = element_text(hjust = 0.5),
+        legend.position="bottom",
+        panel.grid.major.y = NULL,
+        panel.grid.major.x = NULL,
+        panel.background = element_rect(fill = "white")) +
+  ggtitle(as.character(model1)[2]) 
+
+
+acf2 = ggAcf(reg2$residuals, lag.max = 14, color = "red") + 
+  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
+        plot.title = element_text(hjust = 0.5),
+        legend.position="bottom",
+        panel.grid.major.y = NULL,
+        panel.grid.major.x = NULL,
+        panel.background = element_rect(fill = "white")) +
+  ggtitle(as.character(model2)[2]) 
+
+pacf2 = ggPacf(reg2$residuals, lag.max = 14, color = "red") + 
+  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
+        plot.title = element_text(hjust = 0.5),
+        legend.position="bottom",
+        panel.grid.major.y = NULL,
+        panel.grid.major.x = NULL,
+        panel.background = element_rect(fill = "white")) +
+  ggtitle(as.character(model2)[2]) 
+
+acf3 = ggAcf(reg3$residuals, lag.max = 14, color = "red") + 
+  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
+        plot.title = element_text(hjust = 0.5),
+        legend.position="bottom",
+        panel.grid.major.y = NULL,
+        panel.grid.major.x = NULL,
+        panel.background = element_rect(fill = "white")) +
+  ggtitle(as.character(model3)[2]) 
+
+pacf3 = ggPacf(reg3$residuals, lag.max = 14, color = "red") + 
+  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
+        plot.title = element_text(hjust = 0.5),
+        legend.position="bottom",
+        panel.grid.major.y = NULL,
+        panel.grid.major.x = NULL,
+        panel.background = element_rect(fill = "white")) +
+  ggtitle(as.character(model3)[2]) 
+
+#combine
+acp = ggarrange(acf1, pacf1, acf2, pacf2, acf3, pacf3, nrow = 3, ncol = 2)
+annotate_figure(acp, bottom = text_grob("Blue Lines denote 95% Confidence Intervals", hjust = 1, x = 1))
+>>>>>>> 8a953ab67db0d2c7612884b39a20db0c18800fcf
 
