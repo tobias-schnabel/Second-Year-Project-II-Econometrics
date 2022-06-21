@@ -150,66 +150,12 @@ summary(reg1)
 summary(reg2)
 summary(reg3)
 
-#2.3: residuals + acf/pacf
-#ACF/PACF plots
-acf1 = ggAcf(reg1$residuals, lag.max = 25, type = "correlation", color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-          plot.title = element_text(hjust = 0.5),
-          legend.position="bottom",
-          panel.grid.major.y = NULL,
-          panel.grid.major.x = NULL,
-          panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model1)[2]) 
+#2.3: residuals + acf/pacf in Plots script
+source("Plots.R", echo = F)
+#show plots
+acp2
+acp1
 
-pacf1 = ggPacf(reg1$residuals, lag.max = 25, color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model1)[2]) 
-
-
-acf2 = ggAcf(reg2$residuals, lag.max = 25, type = "correlation", color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model2)[2]) 
-
-pacf2 = ggPacf(reg2$residuals, lag.max = 25, color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model2)[2]) 
-
-acf3 = ggAcf(reg3$residuals, lag.max = 25, type = "correlation", color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model3)[2]) 
-
-pacf3 = ggPacf(reg3$residuals, lag.max = 25, color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model3)[2]) 
-
-#combine
-acp = ggarrange(acf1, pacf1, acf2, pacf2, acf3, pacf3, nrow = 3, ncol = 2)
-annotate_figure(acp, bottom = text_grob("Blue Lines denote 95% Confidence Intervals", hjust = 1, x = 1))
 
 ##TO DO:
 #for ggACF cpvariance? lags?
