@@ -75,8 +75,8 @@ dat = as.xts.data.table(markoutliers(3))
 #extract weekdays
 seriesdat = dat[.indexwday(dat) %in% 1:5]
 
-stview(dfSummary(seriesdat))
-
+#stview(dfSummary(seriesdat))
+#2.1: 
 #plot
 plot.xts(seriesdat, multi.panel = T, yaxis.same = F)
 
@@ -92,31 +92,11 @@ stat2$mnb = mean(stat2$Nb)
 stat2$mv = mean(stat2$Volume)
 stat2$mn = mean(stat2$Number)
 
-plot.xts(stat2[, 1:4], multi.panel = T, yaxis.same = F)
+xtsp = plot.xts(stat2[, 1:4], multi.panel = T, yaxis.same = F, main = "Stationarity")
 lines(stat2[, "mw"], on=1, lty = "dashed")
 lines(stat2[, "mv"], on=2, lty = "dashed")
 lines(stat2[, "mnb"], on=3, lty = "dashed")
 lines(stat2[, "mn"], on=4, lty = "dashed")
-
-#make prettier graphs
-tidydat = as_tibble(copy2) %>% 
-  rename(Ndistinct = Number) %>% 
-  rename(Number = Nb) %>% 
-  pivot_longer(cols = !c(Date, Outlier, Ndistinct), 
-  names_to = "Variable",
-  values_to = "Value")
-
-gmean = tidydat %>% 
-  group_by(Variable) %>% 
-  summarise(MN = mean(Value))
-
-#2.1: stationarity plot
-statplot = ggplot(data = tidydat, aes(x = Date, y = Value, color = Variable)) +
-  geom_line() + 
-  geom_hline(data = gmean, aes(yintercept = MN), lty = "dashed") +
-  facet_wrap(nrow = 3, vars(Variable), scales = "free") +
-  scale_color_tableau() + theme_minimal()
-statplot
 
 #2.2: reg
 #make dummies for weekdays
@@ -150,10 +130,6 @@ summary(reg3)
 
 #2.3: residuals + acf/pacf in Plots script
 source("Plots.R", echo = F)
-#show plots
-acp2
-acp1
-
 
 ##TO DO:
 
