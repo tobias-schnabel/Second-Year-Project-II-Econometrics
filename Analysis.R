@@ -46,7 +46,7 @@ lanedat = wdat[DestinationCluster %in% destlist,
 tsdat = lanedat[, .(sum(`TR Gross Weight (KG)`), sum(`TR Gross Volume (M3)`), 
                     sum(`Nb of Ship Units`), Number = .N ), by = date]
 # stview(dfSummary(tsdat))
-colnames(tsdat) = c("Date", "Gross Weight in KG",  "Gross Volume", "Nb of Ship Units",
+colnames(tsdat) = c("Date", "Gross Weight in KG",  "Gross Volume", "Number of Ship Units",
                     "Number of Shipments")
 #extend full date range:
 tsdat = as.data.table(tsdat %>% 
@@ -65,7 +65,7 @@ markoutliers = function(x){
     ][, NFlag := (N > x * sd(N) + mean(N))
       ][, VFlag := (V > x * sd(V) + mean(V))
         ][, OUT := fifelse((WFlag | NFlag | VFlag), 1, 0)
-          ][, .(Date, Weight = W,  Volume = V, Nb = N, Number = Num, Outlier = OUT)]
+          ][, .(Date, Weight = W,  Volume = V, Number = N, NumberTR = Num, Outlier = OUT)]
   return(d)
 }
 
@@ -88,14 +88,14 @@ plot.xts(stat, multi.panel = T, yaxis.same = F)
 copy2 = markoutliers(2)
 stat2 = as.xts.data.table(copy[Outlier == 0, 1:5])
 stat2$mw = mean(stat2$Weight)
-stat2$mnb = mean(stat2$Nb)
+stat2$mnumber = mean(stat2$Number)
 stat2$mv = mean(stat2$Volume)
 stat2$mn = mean(stat2$Number)
 
 xtsp = plot.xts(stat2[, 1:4], multi.panel = T, yaxis.same = F, main = "Stationarity")
 lines(stat2[, "mw"], on=1, lty = "dashed")
 lines(stat2[, "mv"], on=2, lty = "dashed")
-lines(stat2[, "mnb"], on=3, lty = "dashed")
+lines(stat2[, "mnumber"], on=3, lty = "dashed")
 lines(stat2[, "mn"], on=4, lty = "dashed")
 
 #2.2: reg
@@ -116,7 +116,7 @@ head(seriesdat)
 #reg eqs
 model1 = Weight ~ tuesday + wednesday + thursday + friday + Outlier
 model2 = Volume ~ tuesday + wednesday + thursday + friday + Outlier
-model3 = Nb ~ tuesday + wednesday + thursday + friday + Outlier
+model3 = Number ~ tuesday + wednesday + thursday + friday + Outlier
 
 #estimate
 reg1 = lm(model1, seriesdat)

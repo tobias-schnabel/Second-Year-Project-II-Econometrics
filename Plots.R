@@ -6,7 +6,6 @@ if (Sys.info()[7] == "ts") {
 #make prettier graphs for 2.1
 tidydat = as_tibble(copy2) %>% 
   rename(Ndistinct = Number) %>% 
-  rename(Number = Nb) %>% 
   pivot_longer(cols = !c(Date, Outlier, Ndistinct), 
                names_to = "Variable",
                values_to = "Value")
@@ -20,9 +19,9 @@ statplot = ggplot(data = tidydat, aes(x = Date, y = Value, color = Variable)) +
   geom_line() + 
   geom_hline(data = gmean, aes(yintercept = MN), lty = "dashed") +
   facet_wrap(nrow = 3, vars(Variable), scales = "free") +
-  scale_color_tableau() + theme_minimal() + theme(legend.position = "bottom") 
+  scale_color_tableau() + theme_minimal() + theme(legend.position = "none") 
   
-ggsave("stationarity.png", plot = statplot, dpi = "retina", width = 8, height = 10, units = "cm")
+ggsave("stationarity.png", plot = statplot, dpi = 800, width = 12, height = 20, units = "cm")
 
 
 #ACF/PACF plots 25 lags
@@ -85,7 +84,7 @@ pacf3 = ggPacf(reg3$residuals, lag.max = 25, color = "red") +
 acp1 = ggarrange(acf1, pacf1, acf2, pacf2, acf3, pacf3, nrow = 3, ncol = 2)
 annotate_figure(acp1, bottom = text_grob("Blue Lines denote 95% Confidence Intervals", hjust = 1, x = 1))
 
-ggsave("acp1.png", plot = acp1, dpi = "retina", width = 8, height = 10, units = "cm")
+ggsave("acp1.png", plot = acp1, dpi = 800, width = 12, height = 20, units = "cm")
 
 #ACF/PACF plots 10 lags
 
@@ -148,7 +147,7 @@ pacf32 = ggPacf(reg3$residuals, lag.max = 10, color = "red") +
 acp2 = ggarrange(acf12, pacf12, acf22, pacf22, acf32, pacf32, nrow = 3, ncol = 2)
 annotate_figure(acp2, bottom = text_grob("Blue Lines denote 95% Confidence Intervals", hjust = 1, x = 1))
 
-ggsave("acp2.png", plot = acp2, dpi = "retina", width = 8, height = 10, units = "cm")
+ggsave("acp2.png", plot = acp2, dpi = 800, width = 12, height = 20, units = "cm")
 
 #delete indivudal plots
 rm(list=ls(pattern="acf"))
