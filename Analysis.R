@@ -4,7 +4,7 @@ rm(list = ls(all = TRUE)) ###CLEAR ALL
 # Package names
 packages <- c("data.table", "dplyr", "zoo", "tidyr", "ggplot2", "ggthemes", "scales", 
               "strucchange", "readxl", "summarytools", "greybox", "ggpubr",
-              "skedastic", "tidyverse", "xtable", "knitr", 
+              "skedastic", "tidyverse", "xtable", "knitr", "kableExtra", "lmtest",
               "stargazer", "patchwork", "remotes", "broom",
               "purrr", "xts", "forecast")
 # package grateful must be installed by hand# install.packages("remotes")
@@ -51,8 +51,6 @@ colnames(tsdat) = c("Date", "Gross Weight in KG",  "Gross Volume", "Nb of Ship U
 #extend full date range:
 tsdat = as.data.table(tsdat %>% 
                         complete(Date = seq.Date((min(Date)-1), max(Date), by="day")))
-
-
 
 markoutliers = function(x){
   d = tsdat #make copy
@@ -158,10 +156,41 @@ acp1
 
 
 ##TO DO:
-#for ggACF cpvariance? lags?
-#implement LM test
 
-#implement Q-test
+#implement LM tests
+lm1 = bgtest(reg1, order = 25)
+lm2 = bgtest(reg2, order = 25)
+lm3 = bgtest(reg3, order = 25)
 
+#implement Q-tests
+lb11 = Box.test(reg1$residuals, lag = 5, type = "Ljung-Box")
+lb21 = Box.test(reg2$residuals, lag = 5, type = "Ljung-Box")
+lb31 = Box.test(reg3$residuals, lag = 5, type = "Ljung-Box")
 
+lb12 = Box.test(reg1$residuals, lag = 15, type = "Ljung-Box")
+lb22 = Box.test(reg2$residuals, lag = 15, type = "Ljung-Box")
+lb32 = Box.test(reg3$residuals, lag = 15, type = "Ljung-Box")
 
+lb13 = Box.test(reg1$residuals, lag = 25, type = "Ljung-Box")
+lb23 = Box.test(reg2$residuals, lag = 25, type = "Ljung-Box")
+lb33 = Box.test(reg3$residuals, lag = 25, type = "Ljung-Box")
+
+source("Tables.R", echo = F)
+rm(list=ls(pattern="lb"))
+
+#export code
+if (Sys.info()[7] == "ts") {
+  
+file.copy('Analysis.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', overwrite = T)
+file.copy('Plots.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', overwrite = T)
+file.copy('Tables.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', overwrite = T)
+file.copy('OR_Data_Cleaning.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', overwrite = T)
+
+#credit OSS authors
+knitr::write_bib(c(.packages()),
+                 "/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/packages.bib")
+
+# grateful::cite_packages(output = "paragraph", dependencies = T, include.RStudio = T, 
+#                         out.dir = "/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/",
+#                         bib.file = "grateful.bib")
+}

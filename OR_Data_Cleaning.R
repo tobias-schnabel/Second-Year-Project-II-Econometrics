@@ -16,23 +16,17 @@ setwd(Paths[Sys.info()[7]])
 
 #location to cluster
 #issue 1: shipment already at destination
-
-#L,M,N,O -> if same, shipment is already at cluster (drop)
-ordat = as.data.table(read_excel('Data.xlsx'))
-
-
 #drop Lat-Long duplicates
 orwdat = ordat[OriginClusterLat != OriginLat][OriginClusterLong != OriginLong]
 
 #drop shipments over 22 tons
 orwdat = orwdat[`TR Gross Weight (KG)` <= 20000][`TR Gross Volume (M3)` <= 82]
 
-
 #sort on origin cluster and PU Date
 setorder(orwdat, -`Nb of Ship Units`, -PUDate, na.last = TRUE)
 #stview(dfSummary(orwdat))
 
-#filter 
+#filter, drop unnecessary cols, rename vars, add counter var to id 20+/3-+ days, sort
 orex = as_tibble(orwdat) %>% 
   filter(OriginCluster == "Cluster2") %>% 
   select(-c(2,4,7,8,9,16,17,18,19,20,28)) %>% 
@@ -53,7 +47,6 @@ orex = as_tibble(orwdat) %>%
 export1 = orex %>% filter(NumPerDay > 19) %>% 
   filter(NumPerDay < 30) %>% 
   arrange(desc(NumPerDay), Date)
-
 #get dates
 datelist1 = head(unique(export1$Date), 5)
 
@@ -63,13 +56,10 @@ export1 = export1 %>%
   distinct(SLC, Date, .keep_all = T) %>% 
   select(-c(5,7,8,9,14,15,16,17,18,19))
 
-View(export1)
-
 #grab more than 30
 export2 = orex %>% filter(NumPerDay > 30) %>%
   arrange(desc(NumPerDay), Date)
-
-
+#get dates
 datelist2 = head(unique(export2$Date), 5)
 
 #subset
@@ -77,22 +67,16 @@ export2 = export2 %>%
   filter(Date %in% datelist2) %>%
   distinct(SLC, Date, .keep_all = T) %>% 
   select(-c(5,7,8,9,14,15,16,17,18,19))
-#combine
 
+#combine
 export = export1 %>%
   bind_rows(export2) %>% 
   relocate(SLC, .after = Date)
-  
-
-
+#strip latter half of SLC identifier (first part is already unique)  
 SLC = export$SLC
 SLC = sub(" .*", "", SLC)
 SLC = sub("T011.", "", SLC)
-
 export$SLC = SLC
-
-  
-View(export)
 
 #export to txt
 write.table(export, file = "Data.txt", sep = " ", 

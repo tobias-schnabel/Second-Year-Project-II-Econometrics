@@ -128,6 +128,7 @@ annotate_figure(acp2, bottom = text_grob("Blue Lines denote 95% Confidence Inter
 
 ggsave("acp2.png", plot = acp2, dpi = "retina", width = 10, height = 15, units = "cm")
 
-
+#delete indivudal plots
+rm(list=ls(pattern="acf"))
 #back to regular wd
 setwd(Paths[Sys.info()[7]])
