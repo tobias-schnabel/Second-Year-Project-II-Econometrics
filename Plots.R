@@ -3,6 +3,28 @@ if (Sys.info()[7] == "ts") {
   setwd("/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures")
 }
 
+#make prettier graphs for 2.1
+tidydat = as_tibble(copy2) %>% 
+  rename(Ndistinct = Number) %>% 
+  rename(Number = Nb) %>% 
+  pivot_longer(cols = !c(Date, Outlier, Ndistinct), 
+               names_to = "Variable",
+               values_to = "Value")
+
+gmean = tidydat %>% 
+  group_by(Variable) %>% 
+  summarise(MN = mean(Value))
+
+#2.1: stationarity plot
+statplot = ggplot(data = tidydat, aes(x = Date, y = Value, color = Variable)) +
+  geom_line() + 
+  geom_hline(data = gmean, aes(yintercept = MN), lty = "dashed") +
+  facet_wrap(nrow = 3, vars(Variable), scales = "free") +
+  scale_color_tableau() + theme_minimal()
+
+ggsave("stationarity.png", plot = statplot, dpi = "retina", width = 10, height = 15, units = "cm")
+
+
 #ACF/PACF plots 25 lags
 acf1 = ggAcf(reg1$residuals, lag.max = 25, type = "correlation", color = "red") + 
   theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
