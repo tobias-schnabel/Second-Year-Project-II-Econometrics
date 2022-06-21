@@ -20,15 +20,9 @@ statplot = ggplot(data = tidydat, aes(x = Date, y = Value, color = Variable)) +
   geom_line() + 
   geom_hline(data = gmean, aes(yintercept = MN), lty = "dashed") +
   facet_wrap(nrow = 3, vars(Variable), scales = "free") +
-<<<<<<< HEAD
   scale_color_tableau() + theme_minimal() + theme(legend.position = "bottom") 
   
 ggsave("stationarity.png", plot = statplot, dpi = "retina", width = 8, height = 10, units = "cm")
-=======
-  scale_color_tableau() + theme_minimal()
-
-ggsave("stationarity.png", plot = statplot, dpi = "retina", width = 10, height = 15, units = "cm")
->>>>>>> 3839316775b971b5d55f66ad3c8d4cf5f6627268
 
 
 #ACF/PACF plots 25 lags
