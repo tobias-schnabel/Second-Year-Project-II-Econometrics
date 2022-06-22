@@ -53,6 +53,8 @@ lb33 = Box.test(reg3$residuals, lag = 25, type = "Ljung-Box")
 source("Tables.R", echo = F)
 rm(list=ls(pattern="lb"))
 
+source("Tables.R", echo = F)
+
 #######export code#####
 if (Sys.info()[7] == "ts") {
   
