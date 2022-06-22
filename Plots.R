@@ -4,7 +4,7 @@ if (Sys.info()[7] == "ts") {
 }
 
 #make prettier graphs for 2.1
-tidydat = as_tibble(copy2) %>% 
+tidydat = as_tibble(copy) %>% 
   rename(Ndistinct = Number) %>% 
   pivot_longer(cols = !c(Date, Outlier, Ndistinct), 
                names_to = "Variable",
@@ -23,62 +23,42 @@ statplot = ggplot(data = tidydat, aes(x = Date, y = Value, color = Variable)) +
   
 ggsave("stationarity.png", plot = statplot, dpi = 800, width = 12, height = 20, units = "cm")
 
+acf_theme = theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
+                  axis.text.y = element_text(size=12), 
+                  axis.text.x = element_text(size=10), 
+                  axis.title.y = element_text(size=12),
+                  axis.title.x = element_text(size=8),
+                  plot.title = element_text(size=10, hjust = 0.5),
+                  legend.position="bottom",
+                  panel.grid.major.y = NULL,
+                  panel.grid.major.x = NULL,
+                  panel.background = element_rect(fill = "white"))
 
 #ACF/PACF plots 25 lags
 acf1 = ggAcf(reg1$residuals, lag.max = 25, type = "correlation", color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model1)[2]) 
+        acf_theme +  ylim(c(-0.15,0.15)) +
+        ggtitle(as.character(model1)[2]) 
 
 pacf1 = ggPacf(reg1$residuals, lag.max = 25, color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model1)[2]) 
+        acf_theme + ylim(c(-0.15,0.15)) +
+        ggtitle(as.character(model1)[2]) 
 
 
 acf2 = ggAcf(reg2$residuals, lag.max = 25, type = "correlation", color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model2)[2]) 
+        acf_theme + ylim(c(-0.15,0.15)) +
+        ggtitle(as.character(model2)[2]) 
 
 pacf2 = ggPacf(reg2$residuals, lag.max = 25, color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model2)[2]) 
+        acf_theme + ylim(c(-0.15,0.15)) +
+        ggtitle(as.character(model2)[2]) 
 
 acf3 = ggAcf(reg3$residuals, lag.max = 25, type = "correlation", color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model3)[2]) 
+        acf_theme + ylim(c(-0.15,0.15)) +
+        ggtitle(as.character(model3)[2]) 
 
 pacf3 = ggPacf(reg3$residuals, lag.max = 25, color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model3)[2]) 
+        acf_theme + ylim(c(-0.15,0.15)) +
+        ggtitle(as.character(model3)[2]) 
 
 #combine
 acp1 = ggarrange(acf1, pacf1, acf2, pacf2, acf3, pacf3, nrow = 3, ncol = 2)
@@ -89,59 +69,29 @@ ggsave("acp1.png", plot = acp1, dpi = 800, width = 12, height = 20, units = "cm"
 #ACF/PACF plots 10 lags
 
 acf12 = ggAcf(reg1$residuals, lag.max = 10, type = "correlation", color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model1)[2]) 
+        acf_theme + ylim(c(-0.15,0.15)) +
+        ggtitle(as.character(model1)[2]) 
 
 pacf12 = ggPacf(reg1$residuals, lag.max = 10, color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model1)[2]) 
+        acf_theme + ylim(c(-0.15,0.15)) +
+        ggtitle(as.character(model1)[2]) 
 
 
 acf22 = ggAcf(reg2$residuals, lag.max = 10, type = "correlation", color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model2)[2]) 
+        acf_theme + ylim(c(-0.15,0.15)) +
+        ggtitle(as.character(model2)[2]) 
 
 pacf22 = ggPacf(reg2$residuals, lag.max = 10, color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model2)[2]) 
+        acf_theme + ylim(c(-0.15,0.15)) +
+        ggtitle(as.character(model2)[2]) 
 
 acf32 = ggAcf(reg3$residuals, lag.max = 10, type = "correlation", color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model3)[2]) 
+        acf_theme + ylim(c(-0.15,0.15)) +
+        ggtitle(as.character(model3)[2]) 
 
 pacf32 = ggPacf(reg3$residuals, lag.max = 10, color = "red") + 
-  theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
-        plot.title = element_text(hjust = 0.5),
-        legend.position="bottom",
-        panel.grid.major.y = NULL,
-        panel.grid.major.x = NULL,
-        panel.background = element_rect(fill = "white")) +
-  ggtitle(as.character(model3)[2]) 
+        acf_theme + ylim(c(-0.15,0.15)) +
+        ggtitle(as.character(model3)[2]) 
 
 #combine
 acp2 = ggarrange(acf12, pacf12, acf22, pacf22, acf32, pacf32, nrow = 3, ncol = 2)
