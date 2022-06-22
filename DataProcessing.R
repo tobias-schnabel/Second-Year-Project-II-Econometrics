@@ -24,6 +24,7 @@ colnames(tsdat) = c("Date", "Gross Weight in KG",  "Gross Volume", "Number of Sh
 #extend full date range:
 tsdat = as.data.table(tsdat %>% 
                         complete(Date = seq.Date((min(Date)-1), max(Date), by="day")))
+#(dates double-checked by hand with calendar)
 
 markoutliers = function(x){
   d = tsdat #make copy

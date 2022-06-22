@@ -5,7 +5,7 @@ rm(list = ls(all = TRUE)) ###CLEAR ALL
 packages <- c("data.table", "dplyr", "zoo", "tidyr", "ggplot2", "ggthemes", 
               "scales", "strucchange", "readxl", "summarytools", "greybox", 
               "ggpubr", "skedastic", "tidyverse", "xtable", "knitr", "kableExtra", 
-              "zoo", "xts", "lmtest", "forecast", "sarima", "seasonal",
+              "zoo", "xts", "lmtest", "forecast", "sarima",
               "stargazer", "patchwork", "remotes", "broom", "purrr")
       
 # package grateful must be installed by hand# install.packages("remotes")
@@ -63,7 +63,6 @@ wt3i = white_lm(reg3, interactions = T)
 source("Tables.R", echo = F)
 
 ###SEASONALITY#### 
-head(seriesdat)
 Weight = seriesdat$Weight
 Volume = seriesdat$Volume
 Number = seriesdat$Number
@@ -74,10 +73,7 @@ covariates = cbind(seriesdat$Outlier,
                    seriesdat$tuesday, seriesdat$wednesday,
                    seriesdat$thursday, seriesdat$friday)
 
-seasonaldat = final(seas(tsdat))
 
-rawdat = markoutliers(2)[,2:6]
-dat = ts(data = rawdat, start=c(2017,1,1), frequency = 365)
 
 
 aaw = auto.arima(Weight, d=0,
@@ -85,16 +81,40 @@ aaw = auto.arima(Weight, d=0,
                parallel =  TRUE, 
                stepwise = FALSE,
                xreg = covariates,
-               start.P = 10,
                ic = "bic" )
-aaw$arma
 
-arima.weight = arima(Weight, order = c(5,0,0), 
-                     seasonal = c(15,0,0), 
+arima.weight = arima(Weight, order = aaw$arma[1:3], 
+                     seasonal = list(order = aaw$arma[4:6], period = aaw$arma[7]), 
                      xreg = covariates,
                      include.mean = T)
 
-stargazer(arima.weight, type = "text")
+aav = auto.arima(Volume, d=0,
+                 seasonal = TRUE, 
+                 parallel =  TRUE, 
+                 stepwise = FALSE,
+                 xreg = covariates,
+                 ic = "bic" )
+
+aav$arma
+
+arima.volume = arima(Volume, order = aav$arma[1:3], 
+                     seasonal = list(order = aav$arma[4:6], period = aav$arma[7]), 
+                     xreg = covariates,
+                     include.mean = T)
+
+aan = auto.arima(Number, d=0,
+                 seasonal = TRUE, 
+                 parallel =  TRUE, 
+                 stepwise = FALSE,
+                 xreg = covariates,
+                 ic = "bic" )
+
+arima.number = arima(Number, order = aan$arma[1:3], 
+                     seasonal = list(order = aan$arma[4:6], period = aan$arma[7]), 
+                     xreg = covariates,
+                     include.mean = T)
+
+stargazer(arima.weight, arima.volume, arima.number, type = "text")
 
 #######export code#####
 if (Sys.info()[7] == "ts") {
