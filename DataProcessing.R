@@ -58,13 +58,11 @@ stat = as.xts.data.table(copy[Outlier == 0, 1:5])
 stat$mw = mean(stat$Weight)
 stat$mnumber = mean(stat$Number)
 stat$mv = mean(stat$Volume)
-stat$mn = mean(stat$Number)
 
 xtsp1 = plot.xts(stat[, 1:4], multi.panel = T, yaxis.same = F, main = "")
 lines(stat[, "mw"], on=1, lty = "dashed")
 lines(stat[, "mv"], on=2, lty = "dashed")
 lines(stat[, "mnumber"], on=3, lty = "dashed")
-lines(stat[, "mn"], on=4, lty = "dashed")
 
 #export plots
 if (Sys.info()[7] == "ts") {
@@ -82,7 +80,7 @@ if (Sys.info()[7] == "ts") {
   setwd(Paths[Sys.info()[7]])
 }
 
-rm(stat, lanedat, dat, tsdat)
+#rm(stat, lanedat, dat, tsdat)
 #2.2: reg
 #make dummies for weekdays
 seriesdat$monday = 0

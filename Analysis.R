@@ -2,11 +2,12 @@
 #########################HOUSEKEEPING########################
 rm(list = ls(all = TRUE)) ###CLEAR ALL
 # Package names
-packages <- c("data.table", "dplyr", "zoo", "tidyr", "ggplot2", "ggthemes", "scales", 
-              "strucchange", "readxl", "summarytools", "greybox", "ggpubr",
-              "skedastic", "tidyverse", "xtable", "knitr", "kableExtra", "lmtest",
-              "stargazer", "patchwork", "remotes", "broom",
-              "purrr", "xts", "forecast")
+packages <- c("data.table", "dplyr", "zoo", "tidyr", "ggplot2", "ggthemes", 
+              "scales", "strucchange", "readxl", "summarytools", "greybox", 
+              "ggpubr", "skedastic", "tidyverse", "xtable", "knitr", "kableExtra", 
+              "zoo", "xts", "lmtest", "forecast", "sarima", "seasonal",
+              "stargazer", "patchwork", "remotes", "broom", "purrr")
+      
 # package grateful must be installed by hand# install.packages("remotes")
 # remotes::install_github("Pakillo/grateful")
 # Install packages not yet installed
@@ -61,7 +62,39 @@ wt3i = white_lm(reg3, interactions = T)
 #make tables
 source("Tables.R", echo = F)
 
+###SEASONALITY#### 
+head(seriesdat)
+Weight = seriesdat$Weight
+Volume = seriesdat$Volume
+Number = seriesdat$Number
+Outliers = seriesdat$Outlier
 
+weight.cov = cbind(seriesdat$Outlier, seriesdat$friday)
+covariates = cbind(seriesdat$Outlier, 
+                   seriesdat$tuesday, seriesdat$wednesday,
+                   seriesdat$thursday, seriesdat$friday)
+
+seasonaldat = final(seas(tsdat))
+
+rawdat = markoutliers(2)[,2:6]
+dat = ts(data = rawdat, start=c(2017,1,1), frequency = 365)
+
+
+aaw = auto.arima(Weight, d=0,
+               seasonal = TRUE, 
+               parallel =  TRUE, 
+               stepwise = FALSE,
+               xreg = covariates,
+               start.P = 10,
+               ic = "bic" )
+aaw$arma
+
+arima.weight = arima(Weight, order = c(5,0,0), 
+                     seasonal = c(15,0,0), 
+                     xreg = covariates,
+                     include.mean = T)
+
+stargazer(arima.weight, type = "text")
 
 #######export code#####
 if (Sys.info()[7] == "ts") {
