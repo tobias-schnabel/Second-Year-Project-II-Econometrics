@@ -42,8 +42,24 @@ print(xtable(q.mat, caption = "Q-Tests of Regresion Residuals",
              digits = c(0,3,5)),
 file = "qtable", floating = T, table.placement = "H", caption.placement = "top", hline.after = c(-1,0,3,6,9))
 
+#White tests
+het.mat = matrix(NA, 3, 4)
+rownames(het.mat) = c("Weight", "Volume", "Number")
+colnames(het.mat) = c("Statistic, No Cross-Terms", "p-value, No Cross-Terms", "Statistic, Cross-Terms", "p-value, Cross-Terms")
+
+het.mat[1,] = c(wt1$statistic, wt1$p.value, wt1i$statistic, wt1i$p.value)
+het.mat[2,] = c(wt2$statistic, wt2$p.value, wt1i$statistic, wt2i$p.value)
+het.mat[3,] = c(wt3$statistic, wt3$p.value, wt1i$statistic, wt3i$p.value)
+
+print(xtable(het.mat, caption = "White Tests for Heteroskedasticity in Regresion Residuals",
+             label = "White",
+             align = "l|c|c|c|c",
+             digits = c(0,3,5,3,5)),
+      file = "whitetable", floating = T, table.placement = "H", caption.placement = "top" )
 
 
+rm(list=ls(pattern="lb"))
+rm(list=ls(pattern="wt"))
 #back to regular wd
 setwd(Paths[Sys.info()[7]])
 

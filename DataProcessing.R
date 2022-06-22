@@ -49,7 +49,8 @@ seriesdat = dat[.indexwday(dat) %in% 1:5]
 
 #2.1: 
 #plot
-plot.xts(seriesdat, multi.panel = T, yaxis.same = F)
+plot.xts(seriesdat[, c(1,2,3,5)], multi.panel = T, yaxis.same = F, main = "Outliers")
+
 
 #make copy of data with outliers of 2 SD droped
 copy = markoutliers(2)
@@ -59,11 +60,27 @@ stat$mnumber = mean(stat$Number)
 stat$mv = mean(stat$Volume)
 stat$mn = mean(stat$Number)
 
-xtsp = plot.xts(stat[, 1:4], multi.panel = T, yaxis.same = F, main = "Stationarity")
+xtsp1 = plot.xts(stat[, 1:4], multi.panel = T, yaxis.same = F, main = "")
 lines(stat[, "mw"], on=1, lty = "dashed")
 lines(stat[, "mv"], on=2, lty = "dashed")
 lines(stat[, "mnumber"], on=3, lty = "dashed")
 lines(stat[, "mn"], on=4, lty = "dashed")
+
+#export plots
+if (Sys.info()[7] == "ts") {
+  setwd("/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures")
+  
+  #export
+  png("Outliers.png", width = 10, height = 12, units = "cm", res = 800)
+  print(plot.xts(seriesdat[, c(1,2,3,5)], multi.panel = T, yaxis.same = F, main = ""))
+  dev.off() 
+  
+  png("Stationarity.png", width = 10, height = 12, units = "cm", res = 800)
+  print(xtsp1)
+  dev.off() 
+  #back to regular wd
+  setwd(Paths[Sys.info()[7]])
+}
 
 rm(stat, lanedat, dat, tsdat)
 #2.2: reg

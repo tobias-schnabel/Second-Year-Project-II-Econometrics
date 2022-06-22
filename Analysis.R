@@ -28,7 +28,7 @@ setwd(Paths[Sys.info()[7]])
 #1 until 2.2:
 source("DataProcessing.R", echo = F)
 
-#2.3: residuals + acf/pacf in Plots script
+#2.3: stationarity, residuals  acf/pacf in Plots script
 source("Plots.R", echo = F)
 
 #implement LM tests
@@ -49,16 +49,25 @@ lb13 = Box.test(reg1$residuals, lag = 25, type = "Ljung-Box")
 lb23 = Box.test(reg2$residuals, lag = 25, type = "Ljung-Box")
 lb33 = Box.test(reg3$residuals, lag = 25, type = "Ljung-Box")
 
+#check for heterosced
+wt1 = white_lm(reg1, interactions = F)
+wt2 = white_lm(reg2, interactions = F)
+wt3 = white_lm(reg3, interactions = F)
+
+wt1i = white_lm(reg1, interactions = T)
+wt2i = white_lm(reg2, interactions = T)
+wt3i = white_lm(reg3, interactions = T)
+
 #make tables
 source("Tables.R", echo = F)
-rm(list=ls(pattern="lb"))
 
-source("Tables.R", echo = F)
+
 
 #######export code#####
 if (Sys.info()[7] == "ts") {
   
 file.copy('Analysis.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', overwrite = T)
+file.copy('DataProcessing.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', overwrite = T)
 file.copy('Plots.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', overwrite = T)
 file.copy('Tables.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', overwrite = T)
 file.copy('OR_Data_Cleaning.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', overwrite = T)

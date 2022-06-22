@@ -21,7 +21,7 @@ statplot = ggplot(data = tidydat, aes(x = Date, y = Value, color = Variable)) +
   facet_wrap(nrow = 3, vars(Variable), scales = "free") +
   scale_color_tableau() + theme_minimal() + theme(legend.position = "none") 
   
-ggsave("stationarity.png", plot = statplot, dpi = 800, width = 12, height = 20, units = "cm")
+ggsave("stationarity2.png", plot = statplot, dpi = 800, width = 12, height = 20, units = "cm")
 
 acf_theme = theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
                   axis.text.y = element_text(size=12), 
