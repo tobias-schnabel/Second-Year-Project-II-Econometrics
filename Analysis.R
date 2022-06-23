@@ -162,7 +162,6 @@ n4= sarima(Number, 1,0,0,1,0,0, S=15, details = T, xreg = covariates, Model = T)
 n5 = sarima(Number, 1,0,0,3,0,0, S=5, details = T, xreg = covariates, Model = T)
 n6 = sarima(Number, 3,0,0,1,0,0, S=5, details = T, xreg = covariates, Model = T)
 
-
 ####Make Forecasts
 # for empty forecast data
 

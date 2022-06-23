@@ -114,11 +114,9 @@ p = ggplot(pd, aes(x = Date, y=value, color = variable)) +
 ggsave("forecasts.png", plot = p, dpi = 800, width = 12, height = 20, units = "cm")
 
 #ind fc
-timedat = as.data.frame(forecastdat)
-timedat$Date = index(forecastdat)
+wfp = autoplot(forecast(Arima(Weight, order =c(5,0,0), seasonal = c(3,0,0), xreg = covariates), xreg = forecast.covariates)) + 
+  ggtitle("SARMA(5,0,0)(3,0,0) 10-Day Forecast") + theme_minimal() 
 
-p2 = ggplot(aes(x= Date, y = Weight), data = timedat) +
-  geom_forecast()
 
 #delete indivudal plots
 rm(list=ls(pattern="acf"))
