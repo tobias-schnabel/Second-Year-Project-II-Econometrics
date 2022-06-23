@@ -5,7 +5,7 @@ rm(list = ls(all = TRUE)) ###CLEAR ALL
 packages <- c("data.table", "dplyr", "zoo", "tidyr", "ggplot2", "ggthemes", 
               "scales", "strucchange", "readxl", "summarytools", "greybox", 
               "ggpubr", "skedastic", "tidyverse", "xtable", "knitr", "kableExtra", 
-              "zoo", "xts", "lmtest", "forecast", "sarima",
+              "zoo", "xts", "lmtest", "forecast", "sarima", "astsa",
               "stargazer", "patchwork", "remotes", "broom", "purrr")
       
 # package grateful must be installed by hand# install.packages("remotes")
@@ -60,12 +60,13 @@ wt2i = white_lm(reg2, interactions = T)
 wt3i = white_lm(reg3, interactions = T)
 
 ###SEASONALITY#### 
+#extract vars
 Weight = seriesdat$Weight
 Volume = seriesdat$Volume
 Number = seriesdat$Number
 Outliers = seriesdat$Outlier
 
-weight.cov = cbind(seriesdat$Outlier, seriesdat$friday)
+#exract covariates
 covariates = cbind(seriesdat$Outlier, 
                    seriesdat$tuesday, seriesdat$wednesday,
                    seriesdat$thursday, seriesdat$friday)
@@ -85,6 +86,7 @@ bn = arima(Number, order = c(0,0,0),
            seasonal = c(0,0,0), 
            xreg = covariates,
            include.mean = T)
+#automatic fitting
 
 aaw = auto.arima(Weight, d=0,
                  max.p = 20,
@@ -101,6 +103,8 @@ arima.weight = arima(Weight, order = aaw$arma[1:3],
                      seasonal = list(order = aaw$arma[4:6], period = aaw$arma[7]), 
                      xreg = covariates,
                      include.mean = T)
+
+require(forecast)
 
 aav = auto.arima(Volume, d=0,
                  max.p = 20,
@@ -138,8 +142,46 @@ arima.number = arima(Number, order = aan$arma[1:3],
 
 stargazer(arima.weight, arima.volume, arima.number, type = "text")
 
-w.diff = diff(Weight, 15)
-n.diff = diff(Number, 15)
+#manual
+require(astsa)
+
+#Weight
+aaw
+w1 = sarima(Weight, 5,0,0, 1,0,0, S=5, details = T, xreg = covariates, Model = T)
+w2 = sarima(Weight, 5,0,0, 3,0,0, S=5, details = T, xreg = covariates, Model = T)
+
+#Volume
+aav
+v1 = sarima(Volume, 0,0,0, 3,0,0, S=5, details = T, xreg = covariates, Model = T)
+
+#Number
+aan
+n1 = sarima(Number, 5,0,0,3,0,0, S=5, details = T, xreg = covariates, Model = T)
+n2 = sarima(Number, 5,0,0,1,0,0, S=15, details = T, xreg = covariates, Model = T)
+n3= sarima(Number, 1,0,0,1,0,0, S=5, details = T, xreg = covariates, Model = T)
+n4= sarima(Number, 1,0,0,1,0,0, S=15, details = T, xreg = covariates, Model = T)
+n5 = sarima(Number, 1,0,0,3,0,0, S=5, details = T, xreg = covariates, Model = T)
+n6 = sarima(Number, 3,0,0,1,0,0, S=5, details = T, xreg = covariates, Model = T)
+
+
+####Make Forecasts
+# for newxreg
+forecast.covariates = matrix(NA, 10, 5)
+forecast.covariates = covariates[1:10]
+forecast.covariates$Outlier = 0
+
+#weight
+wf = predict(arima.weight, n.ahead = 10, newxreg = forecast.covariates)
+wf1 = sarima.for(Weight, 10, 5,0,0, 3,0,0, S=5, details = T, newxreg = forecast.covariates, xreg = covariates)
+
+#volume
+vf = predict(arima.volume, n.ahead = 10, newxreg = forecast.covariates)
+vf1 = sarima.for(Volume, 10, 0,0,0, 3,0,0, S=5, details = T, newxreg = forecast.covariates, xreg = covariates)
+
+#number
+nf = predict(arima.number, n.ahead = 10, newxreg = forecast.covariates)
+nf1 = sarima.for(Number,10, 5,0,0,3,0,0, S=5, newxreg = forecast.covariates, xreg = covariates)
+
 #make tables
 source("Tables.R", echo = F)
 
