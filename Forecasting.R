@@ -58,9 +58,9 @@ nf1 = sarima.for(Number,10, 5,0,0,3,0,0, S=5, newxreg = forecast.covariates, xre
 wf.pred = as.xts(wf$pred)
 index(wf.pred) = index(actual)
 vf.pred = as.xts(vf$pred)
-index(wf.pred) = index(actual)
+index(vf.pred) = index(actual)
 nf.pred = as.xts(nf$pred)
-index(wf.pred) = index(actual)
+index(nf.pred) = index(actual)
 
 `Dynamic Forecast: Weight` = cbind(wf.pred, actual$Weight)
 colnames(`Dynamic Forecast: Weight`) = c("Predicted", "Actual")
@@ -80,7 +80,40 @@ Metrics::rmse(actual$Volume, vf$pred)
 Metrics::rmse(actual$Number, nf$pred)
 
 ###COMBINE FOR PLOTS
+`Forecast: Weight` = cbind(to.daily(as.xts(pred1))[,1], wf.pred)
+colnames(`Forecast: Weight`) = c("Pred. (Static)", "Pred. (Dynamic)")
 
+`Forecast: Volume` = cbind(to.daily(as.xts(pred2))[,1], vf.pred)
+colnames(`Forecast: Volume`) = c("Pred. (Static)", "Pred. (Dynamic)")
+
+`Forecast: Number` = cbind(to.daily(as.xts(pred3))[,1], nf.pred)
+colnames(`Forecast: Number`) = c("Pred. (Static)", "Pred. (Dynamic)")
+
+#empty xts frame
+empty = as.xts(matrix(0,10,3), order.by = index(actual))
+colnames(empty) = c("Weight", "Volume", "Number")
+empty$Weight = actual$Weight
+empty$Volume = actual$Volume
+empty$Number = actual$Number
+
+plot.xts(empty, multi.panel = T, yaxis.same = F, col = 4, legend.loc = "topleft")
+lines(`Forecast: Weight`, on = 1, col = 1:2, legend.loc = "topleft")
+lines(`Forecast: Volume`, on = 2, col = 1:2, legend.loc = "topleft")
+lines(`Forecast: Number`, on = 3, col = 1:2, legend.loc = "topleft")
+
+
+#GGplot
+plotdat = rbind(cbind(actual$Weight, `Forecast: Weight`, rep(1,10)), 
+                cbind(actual$Volume, `Forecast: Volume`, rep(2,10)),
+                cbind(actual$Number, `Forecast: Number`, rep(3,10)) )
+colnames(plotdat) = c("Actual","Static Pred.", "Dynamic Pred.", "Var")
+plotdat = as.data.table(as.data.frame(plotdat))
+str(plotdat)
+pd = melt(plotdat, id.vars = "Var")
+pd$Var[pd$Var==1] <- "Weight"
+pd$Var[pd$Var==2] <- "Volume"
+pd$Var[pd$Var==3] <- "Number"
+as.factor(pd$Var)
 
 #export plots
 if (Sys.info()[7] == "ts") {
