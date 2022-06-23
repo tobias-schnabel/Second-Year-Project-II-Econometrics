@@ -106,27 +106,34 @@ lines(`Forecast: Number`, on = 3, col = 1:2, legend.loc = "topleft")
 plotdat = rbind(cbind(actual$Weight, `Forecast: Weight`, rep(1,10)), 
                 cbind(actual$Volume, `Forecast: Volume`, rep(2,10)),
                 cbind(actual$Number, `Forecast: Number`, rep(3,10)) )
-colnames(plotdat) = c("Actual","Static Pred.", "Dynamic Pred.", "Var")
-plotdat = as.data.table(as.data.frame(plotdat))
-str(plotdat)
-pd = melt(plotdat, id.vars = "Var")
+colnames(plotdat) = c("Actual","Static Forecast", "Dynamic Forecast", "Var")
+
+plotdat = as.data.frame(plotdat)
+dates = index(actual)
+plotdat$Date = rep(index(actual), each = 3)
+pd= as.data.table(plotdat)
+
 pd$Var[pd$Var==1] <- "Weight"
 pd$Var[pd$Var==2] <- "Volume"
 pd$Var[pd$Var==3] <- "Number"
 as.factor(pd$Var)
+pd = melt(pd, id.vars = 4:5, measure.vars = 1:3)
 
 #export plots
 if (Sys.info()[7] == "ts") {
   setwd("/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures")
   
   #export
-  png("Outliers.png", width = 10, height = 12, units = "cm", res = 800)
-  print(plot.xts(seriesdat[, c(1,2,3,5)], multi.panel = T, yaxis.same = F, main = ""))
-  dev.off() 
+  p = ggplot(pd, aes(x = Date, y=value, color = variable)) +
+    geom_line() + facet_wrap(. ~ Var, nrow = 3, scales = "free_y") + 
+    scale_colour_discrete("Values") + theme_minimal() + ylab("") +
+    scale_x_date(date_breaks = "1 day", date_labels = "%D") +
+    theme(axis.text.x=element_text(angle=60, hjust=1),
+          panel.grid.minor = element_blank(),
+          legend.position = "bottom") 
   
-  png("Stationarity.png", width = 10, height = 12, units = "cm", res = 800)
-  print(xtsp1)
-  dev.off() 
+  ggsave("forecasts.png", plot = p, dpi = 800, width = 12, height = 20, units = "cm")
+  
   #back to regular wd
   setwd(Paths[Sys.info()[7]])
 }
