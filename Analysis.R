@@ -5,7 +5,7 @@ rm(list = ls(all = TRUE)) ###CLEAR ALL
 packages <- c("data.table", "dplyr", "zoo", "tidyr", "ggplot2", "ggthemes", 
               "scales", "strucchange", "readxl", "summarytools", "greybox", 
               "ggpubr", "skedastic", "tidyverse", "xtable", "knitr", "kableExtra", 
-              "zoo", "xts", "lmtest", "forecast", "sarima", "astsa",
+              "zoo", "xts", "lmtest", "forecast", "sarima", "astsa", "Metrics"
               "stargazer", "patchwork", "remotes", "broom", "purrr")
       
 # package grateful must be installed by hand# install.packages("remotes")
@@ -164,23 +164,7 @@ n5 = sarima(Number, 1,0,0,3,0,0, S=5, details = T, xreg = covariates, Model = T)
 n6 = sarima(Number, 3,0,0,1,0,0, S=5, details = T, xreg = covariates, Model = T)
 
 
-####Make Forecasts
-# for newxreg
-forecast.covariates = matrix(NA, 10, 5)
-forecast.covariates = covariates[1:10]
-forecast.covariates$Outlier = 0
 
-#weight
-wf = predict(arima.weight, n.ahead = 10, newxreg = forecast.covariates)
-wf1 = sarima.for(Weight, 10, 5,0,0, 3,0,0, S=5, details = T, newxreg = forecast.covariates, xreg = covariates)
-
-#volume
-vf = predict(arima.volume, n.ahead = 10, newxreg = forecast.covariates)
-vf1 = sarima.for(Volume, 10, 0,0,0, 3,0,0, S=5, details = T, newxreg = forecast.covariates, xreg = covariates)
-
-#number
-nf = predict(arima.number, n.ahead = 10, newxreg = forecast.covariates)
-nf1 = sarima.for(Number,10, 5,0,0,3,0,0, S=5, newxreg = forecast.covariates, xreg = covariates)
 
 #make tables
 source("Tables.R", echo = F)

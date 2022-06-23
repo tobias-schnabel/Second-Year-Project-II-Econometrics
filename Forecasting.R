@@ -1,0 +1,101 @@
+####Make Forecasts
+# for empty forecast data
+
+#compute RMSE
+require(Metrics)
+#actual data
+actual = last(seriesdat, 10)
+
+forecast.covariates = matrix(NA, 10, 5)
+forecast.covariates = last(covariates, 10)
+forecast.covariates$Outlier = 0
+
+#drop last 10 obs
+forecastdat = first(seriesdat, (nrow(seriesdat)-10))
+
+###Static
+reg1f = lm(model1, data = forecastdat)
+reg2f = lm(model2, data = forecastdat)
+reg3f = lm(model3, data = forecastdat)
+
+pred1 = predict(reg1f, newdata = forecast.covariates)
+pred2 = predict(reg2f, newdata = forecast.covariates)
+pred3 = predict(reg3f, newdata = forecast.covariates)
+
+#for plotting
+`Static Forecast: Weight` = cbind(to.daily(as.xts(pred1))[,1], to.daily(actual$Weight)[,1])
+colnames(`Static Forecast: Weight`) = c("Predicted", "Actual")
+
+`Static Forecast: Volume` = cbind(to.daily(as.xts(pred2))[,1], to.daily(actual$Volume)[,1])
+colnames(`Static Forecast: Volume`) = c("Predicted", "Actual")
+
+`Static Forecast: Number` = cbind(to.daily(as.xts(pred3))[,1], to.daily(actual$Number)[,1])
+colnames(`Static Forecast: Number`) = c("Predicted", "Actual")
+
+plot.xts(`Static Forecast: Weight`, legend.loc = "topleft")
+plot.xts(`Static Forecast: Volume`, legend.loc = "topleft")
+plot.xts(`Static Forecast: Number`, legend.loc = "topleft")
+
+Metrics::rmse(actual$Weight, pred1)
+Metrics::rmse(actual$Volume, pred2)
+Metrics::rmse(actual$Number, pred3)
+
+###Dynamic
+
+#weight
+wf = predict(arima.weight, n.ahead = 10, newxreg = forecast.covariates)
+wf1 = sarima.for(Weight, 10, 5,0,0, 3,0,0, S=5, details = T, newxreg = forecast.covariates, xreg = covariates)
+
+#volume
+vf = predict(arima.volume, n.ahead = 10, newxreg = forecast.covariates)
+vf1 = sarima.for(Volume, 10, 0,0,0, 3,0,0, S=5, details = T, newxreg = forecast.covariates, xreg = covariates)
+
+#number
+nf = predict(arima.number, n.ahead = 10, newxreg = forecast.covariates)
+nf1 = sarima.for(Number,10, 5,0,0,3,0,0, S=5, newxreg = forecast.covariates, xreg = covariates)
+
+#xts fuckery
+wf.pred = as.xts(wf$pred)
+index(wf.pred) = index(actual)
+vf.pred = as.xts(vf$pred)
+index(wf.pred) = index(actual)
+nf.pred = as.xts(nf$pred)
+index(wf.pred) = index(actual)
+
+`Dynamic Forecast: Weight` = cbind(wf.pred, actual$Weight)
+colnames(`Dynamic Forecast: Weight`) = c("Predicted", "Actual")
+
+`Dynamic Forecast: Volume` = cbind(vf.pred, actual$Volume)
+colnames(`Dynamic Forecast: Volume`) = c("Predicted", "Actual")
+
+`Dynamic Forecast: Number` = cbind(nf.pred, actual$Number)
+colnames(`Dynamic Forecast: Number`) = c("Predicted", "Actual")
+
+plot.xts(`Dynamic Forecast: Weight`, legend.loc = "topleft")
+plot.xts(`Dynamic Forecast: Volume`, legend.loc = "topleft")
+plot.xts(`Dynamic Forecast: Number`, legend.loc = "topleft")
+
+Metrics::rmse(actual$Weight, wf$pred)
+Metrics::rmse(actual$Volume, vf$pred)
+Metrics::rmse(actual$Number, nf$pred)
+
+###COMBINE FOR PLOTS
+
+
+#export plots
+if (Sys.info()[7] == "ts") {
+  setwd("/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures")
+  
+  #export
+  png("Outliers.png", width = 10, height = 12, units = "cm", res = 800)
+  print(plot.xts(seriesdat[, c(1,2,3,5)], multi.panel = T, yaxis.same = F, main = ""))
+  dev.off() 
+  
+  png("Stationarity.png", width = 10, height = 12, units = "cm", res = 800)
+  print(xtsp1)
+  dev.off() 
+  #back to regular wd
+  setwd(Paths[Sys.info()[7]])
+}
+
+
