@@ -59,9 +59,6 @@ wt1i = white_lm(reg1, interactions = T)
 wt2i = white_lm(reg2, interactions = T)
 wt3i = white_lm(reg3, interactions = T)
 
-#make tables
-source("Tables.R", echo = F)
-
 ###SEASONALITY#### 
 Weight = seriesdat$Weight
 Volume = seriesdat$Volume
@@ -73,15 +70,32 @@ covariates = cbind(seriesdat$Outlier,
                    seriesdat$tuesday, seriesdat$wednesday,
                    seriesdat$thursday, seriesdat$friday)
 
+#baselines
+bw = arima(Weight, order = c(0,0,0),
+           seasonal = c(0,0,0), 
+           xreg = covariates,
+           include.mean = T)
 
+bv = arima(Volume, order = c(0,0,0),
+           seasonal = c(0,0,0), 
+           xreg = covariates,
+           include.mean = T)
 
+bn = arima(Number, order = c(0,0,0),
+           seasonal = c(0,0,0), 
+           xreg = covariates,
+           include.mean = T)
 
 aaw = auto.arima(Weight, d=0,
-               seasonal = TRUE, 
-               parallel =  TRUE, 
-               stepwise = FALSE,
-               xreg = covariates,
-               ic = "bic" )
+                 max.p = 20,
+                 max.q = 20,
+                 max.D = 20,
+                 max.Q = 20,
+                seasonal = TRUE, 
+                parallel =  TRUE, 
+                stepwise = FALSE,
+                xreg = covariates,
+                ic = "aic" )
 
 arima.weight = arima(Weight, order = aaw$arma[1:3], 
                      seasonal = list(order = aaw$arma[4:6], period = aaw$arma[7]), 
@@ -89,11 +103,15 @@ arima.weight = arima(Weight, order = aaw$arma[1:3],
                      include.mean = T)
 
 aav = auto.arima(Volume, d=0,
+                 max.p = 20,
+                 max.q = 20,
+                 max.D = 20,
+                 max.Q = 20,
                  seasonal = TRUE, 
                  parallel =  TRUE, 
                  stepwise = FALSE,
                  xreg = covariates,
-                 ic = "bic" )
+                 ic = "aic" )
 
 aav$arma
 
@@ -103,11 +121,15 @@ arima.volume = arima(Volume, order = aav$arma[1:3],
                      include.mean = T)
 
 aan = auto.arima(Number, d=0,
+                 max.p = 20,
+                 max.q = 20,
+                 max.D = 20,
+                 max.Q = 20,
                  seasonal = TRUE, 
                  parallel =  TRUE, 
                  stepwise = FALSE,
                  xreg = covariates,
-                 ic = "bic" )
+                 ic = "aic" )
 
 arima.number = arima(Number, order = aan$arma[1:3], 
                      seasonal = list(order = aan$arma[4:6], period = aan$arma[7]), 
@@ -115,6 +137,11 @@ arima.number = arima(Number, order = aan$arma[1:3],
                      include.mean = T)
 
 stargazer(arima.weight, arima.volume, arima.number, type = "text")
+
+w.diff = diff(Weight, 15)
+n.diff = diff(Number, 15)
+#make tables
+source("Tables.R", echo = F)
 
 #######export code#####
 if (Sys.info()[7] == "ts") {

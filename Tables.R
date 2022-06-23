@@ -60,6 +60,28 @@ print(xtable(het.mat, caption = "White Tests for Heteroskedasticity in Regresion
 
 rm(list=ls(pattern="lb"))
 rm(list=ls(pattern="wt"))
+
+#baseline regs
+stargazer(reg1, reg2, reg3, type = "latex",
+          out = "regs",
+          title = "Baseline Regression Results",
+          digits = 4, float = T, model.names = T)
+
+#arma(0,0)(0,0)
+stargazer(bw, bv, bn, type = "latex",
+          out = "arma00",
+          title = "ARMA(0,0)(0,0) Estimation Results",
+          digits = 4, float = T, model.names = T)
+
+#arima models
+
+stargazer(arima.weight, arima.volume, arima.number, type = "latex",
+          title = "ARMA(p,q)(P,Q) Estimation Results",
+          out = "arma",
+          covariate.labels = c("AR(1)", "AR(2)", "AR(3)", "AR(4)", "AR(5)",
+                               "Outlier", "Tueday", "Wednesday", "Thursday", "Friday"),
+          digits = 4, float = T, model.names = T)
+
 #back to regular wd
 setwd(Paths[Sys.info()[7]])
 
