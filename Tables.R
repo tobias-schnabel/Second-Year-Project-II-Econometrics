@@ -103,9 +103,9 @@ rownames(rmse.mat) = c("Weight", "Volume", "Number")
 rmse.mat[1,] = c(Metrics::rmse(actual$Weight, pred1), Metrics::rmse(actual$Weight, wf$pred), 
                  Metrics::rmse(actual$Weight, pred1o), Metrics::rmse(actual$Weight, wfo$pred))
 rmse.mat[2,] = c(Metrics::rmse(actual$Volume, pred2), Metrics::rmse(actual$Volume, vf$pred), 
-                 Metrics::rmse(actual$Weight, pred2o), Metrics::rmse(actual$Weight, vfo$pred))
+                 Metrics::rmse(actual$Volume, pred2o), Metrics::rmse(actual$Volume, vfo$pred))
 rmse.mat[3,] = c(Metrics::rmse(actual$Number, pred3), Metrics::rmse(actual$Number, nf$pred), 
-                 Metrics::rmse(actual$Weight, pred3o), Metrics::rmse(actual$Weight, nfo$pred))
+                 Metrics::rmse(actual$Number, pred3o), Metrics::rmse(actual$Number, nfo$pred))
 
 print(xtable(rmse.mat, caption = "RMSE of Forecast Models",
              label = "rmse",
