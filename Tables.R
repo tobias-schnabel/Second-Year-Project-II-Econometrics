@@ -57,10 +57,6 @@ print(xtable(het.mat, caption = "White Tests for Heteroskedasticity in Regresion
              digits = c(0,3,5,3,5)),
       file = "whitetable", floating = T, table.placement = "H", caption.placement = "top" )
 
-
-rm(list=ls(pattern="lb"))
-rm(list=ls(pattern="wt"))
-
 #baseline regs
 stargazer(reg1, reg2, reg3, type = "latex",
           out = "regs",
@@ -78,9 +74,50 @@ stargazer(bw, bv, bn, type = "latex",
 stargazer(arima.weight, arima.volume, arima.number, type = "latex",
           title = "ARMA(p,q)(P,Q) Estimation Results",
           out = "arma",
-          covariate.labels = c("AR(1)", "AR(2)", "AR(3)", "AR(4)", "AR(5)",
-                               "Outlier", "Tueday", "Wednesday", "Thursday", "Friday"),
           digits = 4, float = T, model.names = T)
+ 
+# covariate.labels = c("AR(1)", "AR(2)", "AR(3)", "AR(4)", "AR(5)",
+#                      "Outlier", "Tueday", "Wednesday", "Thursday", "Friday"),
+
+##RMSE Tables
+
+rmse.mat = matrix(NA, 3,4)
+colnames(rmse.mat) = c("Static Forecast", "Dynamic Forecast", "Static with Outlier", "Dynamic with Outlier")
+rownames(rmse.mat) = c("Weight", "Volume", "Number")
+
+rmse.mat[1,] = c(Metrics::rmse(actual$Weight, pred1), Metrics::rmse(actual$Weight, wf$pred), 
+                 Metrics::rmse(actual$Weight, pred1o), Metrics::rmse(actual$Weight, wfo$pred))
+rmse.mat[2,] = c(Metrics::rmse(actual$Volume, pred2), Metrics::rmse(actual$Volume, vf$pred), 
+                 Metrics::rmse(actual$Weight, pred2o), Metrics::rmse(actual$Weight, vfo$pred))
+rmse.mat[3,] = c(Metrics::rmse(actual$Number, pred3), Metrics::rmse(actual$Number, nf$pred), 
+                 Metrics::rmse(actual$Weight, pred3o), Metrics::rmse(actual$Weight, nfo$pred))
+
+print(xtable(rmse.mat, caption = "RMSE of Forecast Models",
+             label = "rmse",
+             align = "l|c|c|c|c",
+             digits = c(0,2,2,2,2)),
+      file = "rmse", floating = T, table.placement = "H", caption.placement = "top" )
+
+#SARMA diagnostics
+#White tests
+het.mat.sarma = matrix(NA, 3, 4)
+rownames(het.mat.sarma) = c("Weight", "Volume", "Number")
+colnames(het.mat.sarma) = c("Statistic, No Cross-Terms", "p-value, No Cross-Terms", "Statistic, Cross-Terms", "p-value, Cross-Terms")
+
+het.mat.sarma[1,] = c(wt1$statistic, wt1$p.value, wt1i$statistic, wt1i$p.value)
+het.mat.sarma[2,] = c(wt2$statistic, wt2$p.value, wt1i$statistic, wt2i$p.value)
+het.mat.sarma[3,] = c(wt3$statistic, wt3$p.value, wt1i$statistic, wt3i$p.value)
+
+print(xtable(het.mat, caption = "White Tests for Heteroskedasticity in Regresion Residuals",
+             label = "White",
+             align = "l|c|c|c|c",
+             digits = c(0,3,5,3,5)),
+      file = "whitetable", floating = T, table.placement = "H", caption.placement = "top" )
+
+
+rm(list=ls(pattern="lb"))
+rm(list=ls(pattern="wt"))
+
 
 #back to regular wd
 setwd(Paths[Sys.info()[7]])

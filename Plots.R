@@ -63,7 +63,7 @@ pacf32 = ggPacf(reg3$residuals, lag.max = 10, color = "red") +
 
 #combine
 acp2 = ggarrange(acf12, pacf12, acf22, pacf22, acf32, pacf32, nrow = 3, ncol = 2)
-annotate_figure(acp2, bottom = text_grob("Blue Lines denote 95% Confidence Intervals", hjust = 1, x = 1))
+acp2 = annotate_figure(acp2, bottom = text_grob("Blue Lines denote 95% Confidence Intervals", hjust = 1, x = 1))
 
 ggsave("acp2.png", plot = acp2, dpi = 800, width = 12, height = 20, units = "cm")
 
@@ -95,13 +95,13 @@ pacf3 = ggPacf(reg3$residuals, color = "red") +
 
 #combine
 acp1 = ggarrange(acf1, pacf1, acf2, pacf2, acf3, pacf3, nrow = 3, ncol = 2)
-annotate_figure(acp1, bottom = text_grob("Blue Lines denote 95% Confidence Intervals", hjust = 1, x = 1))
+acp1 = annotate_figure(acp1, bottom = text_grob("Blue Lines denote 95% Confidence Intervals", hjust = 1, x = 1))
 
 ggsave("acp1.png", plot = acp1, dpi = 800, width = 12, height = 20, units = "cm")
 
 #forecasting comparison
 
-p = ggplot(pd, aes(x = Date, y=value, color = variable)) +
+fccomp = ggplot(pd, aes(x = Date, y=value, color = variable)) +
   geom_line() + facet_wrap(. ~ Var, nrow = 3, scales = "free_y") + 
   scale_colour_discrete("Values") + theme_minimal() + ylab("") +
   scale_x_date(date_breaks = "1 day", date_labels = "%D") +
@@ -111,11 +111,35 @@ p = ggplot(pd, aes(x = Date, y=value, color = variable)) +
 
 
 
-ggsave("forecasts.png", plot = p, dpi = 800, width = 12, height = 20, units = "cm")
+ggsave("forecasts.png", plot = fccomp, dpi = 800, width = 12, height = 20, units = "cm")
 
 #ind fc
-wfp = autoplot(forecast(Arima(Weight, order =c(5,0,0), seasonal = c(3,0,0), xreg = covariates), xreg = forecast.covariates)) + 
-  ggtitle("SARMA(5,0,0)(3,0,0) 10-Day Forecast") + theme_minimal() 
+wfp = autoplot(forecast(Arima(Weight, weight.params$order, weight.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
+  ggtitle(weight.title) + theme_minimal() + xlab("Date") + theme(axis.text.x = element_blank()) + xlim(100,215)
+
+vfp = autoplot(forecast(Arima(Volume, volume.params$order, volume.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
+  ggtitle(volume.title) + theme_minimal() + xlab("Date") + theme(axis.text.x = element_blank()) + xlim(100,215)
+
+nfp = autoplot(forecast(Arima(Number, number.params$order, number.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
+  ggtitle(number.title) + theme_minimal() + xlab("Date") + theme(axis.text.x = element_blank())+ xlim(100,215)
+
+wfpp = autoplot(forecast(Arima(Weight, weight.params$order, weight.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
+  ggtitle(weight.title) + theme_minimal() + xlab("") + theme(axis.text.x = element_blank()) + xlim(150,215)
+
+vfpp = autoplot(forecast(Arima(Volume, volume.params$order, volume.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
+  ggtitle(volume.title) + theme_minimal() + xlab("") + theme(axis.text.x = element_blank()) + xlim(150,215)
+
+nfpp = autoplot(forecast(Arima(Number, number.params$order, number.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
+  ggtitle(number.title) + theme_minimal() + xlab("") + theme(axis.text.x = element_blank())+ xlim(150,215)
+
+
+fcfacet = ggarrange(wfpp, vfpp, nfpp, nrow = 3, ncol = 1) 
+fcfexport = annotate_figure(fcfacet, bottom = text_grob("Blue Lines denote 95% and 80% Prediction Intervals", hjust = 1, x = 1))
+
+ggsave("forecastWeight.png", plot = wfp, dpi = 800, width = 12, height = 12, units = "cm")
+ggsave("forecastVolume.png", plot = vfp, dpi = 800, width = 12, height = 12, units = "cm")
+ggsave("forecastNumber.png", plot = nfp, dpi = 800, width = 12, height = 12, units = "cm")
+ggsave("forecastPanels.png", plot = fcfexport, dpi = 800, width = 14, height = 16, units = "cm")
 
 
 #delete indivudal plots

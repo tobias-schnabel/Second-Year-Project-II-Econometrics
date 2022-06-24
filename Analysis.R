@@ -4,9 +4,9 @@ rm(list = ls(all = TRUE)) ###CLEAR ALL
 # Package names
 packages <- c("data.table", "dplyr", "zoo", "tidyr", "ggplot2", "ggthemes", 
               "scales", "strucchange", "readxl", "summarytools", "greybox", 
-              "ggpubr", "skedastic", "tidyverse", "xtable", "knitr", "kableExtra", 
+              "ggpubr", "skedastic", "tidyverse", "xtable", "knitr", "tseries",
               "zoo", "xts", "lmtest", "forecast", "sarima", "astsa", "Metrics",
-              "stargazer", "patchwork", "remotes", "broom", "purrr")
+              "tsbox", "stargazer", "patchwork", "remotes", "broom", "purrr")
       
 # package grateful must be installed by hand# install.packages("remotes")
 # remotes::install_github("Pakillo/grateful")
@@ -86,81 +86,69 @@ bn = arima(Number, order = c(0,0,0),
            xreg = covariates,
            include.mean = T)
 #automatic fitting
-
-aaw = auto.arima(Weight, d=0,
-                 max.p = 20,
-                 max.q = 20,
-                 max.D = 20,
-                 max.Q = 20,
-                seasonal = TRUE, 
-                parallel =  TRUE, 
-                stepwise = FALSE,
-                xreg = covariates,
-                ic = "aic" )
-
-arima.weight = arima(Weight, order = aaw$arma[1:3], 
-                     seasonal = list(order = aaw$arma[4:6], period = aaw$arma[7]), 
-                     xreg = covariates,
-                     include.mean = T)
+#convert xts data to ts data
+ts.weight = ts(seriesdat$Weight, frequency = 5)
+ts.volume = ts(seriesdat$Volume, frequency = 5)
+ts.number = ts(seriesdat$Number, frequency = 5)
 
 require(forecast)
+aaw = auto.arima(ts.weight, seasonal = T, parallel = T, xreg = covariates)
 
-aav = auto.arima(Volume, d=0,
-                 max.p = 20,
-                 max.q = 20,
-                 max.D = 20,
-                 max.Q = 20,
-                 seasonal = TRUE, 
-                 parallel =  TRUE, 
-                 stepwise = FALSE,
-                 xreg = covariates,
-                 ic = "aic" )
+aav = auto.arima(ts.volume, seasonal = T, parallel = T, xreg = covariates)
 
-aav$arma
-
-arima.volume = arima(Volume, order = aav$arma[1:3], 
-                     seasonal = list(order = aav$arma[4:6], period = aav$arma[7]), 
-                     xreg = covariates,
-                     include.mean = T)
-
-aan = auto.arima(Number, d=0,
-                 max.p = 20,
-                 max.q = 20,
-                 max.D = 20,
-                 max.Q = 20,
-                 seasonal = TRUE, 
-                 parallel =  TRUE, 
-                 stepwise = FALSE,
-                 xreg = covariates,
-                 ic = "aic" )
-
-arima.number = arima(Number, order = aan$arma[1:3], 
-                     seasonal = list(order = aan$arma[4:6], period = aan$arma[7]), 
-                     xreg = covariates,
-                     include.mean = T)
-
-stargazer(arima.weight, arima.volume, arima.number, type = "text")
+aan = auto.arima(ts.number, seasonal = T, parallel = T, xreg = covariates)
 
 #manual
 require(astsa)
 
 #Weight
 aaw
-w1 = sarima(Weight, 5,0,0, 1,0,0, S=5, details = T, xreg = covariates, Model = T)
-w2 = sarima(Weight, 5,0,0, 3,0,0, S=5, details = T, xreg = covariates, Model = T)
+w1 = sarima(Weight, 0,0,0, 1,0,0, 5, details = T, xreg = covariates, Model = T)
+w2 = sarima(Weight, 3,0,0, 1,0,0, 5, details = T, xreg = covariates, Model = T)
 
 #Volume
 aav
-v1 = sarima(Volume, 0,0,0, 3,0,0, S=5, details = T, xreg = covariates, Model = T)
+v1 = sarima(Volume, 0,1,1, 1,0,0, S=5, details = T, xreg = covariates, Model = T)
 
 #Number
 aan
-n1 = sarima(Number, 5,0,0,3,0,0, S=5, details = T, xreg = covariates, Model = T)
+n1 = sarima(Number, 0,0,0,1,0,0,5, details = T, xreg = covariates, Model = T)
 n2 = sarima(Number, 5,0,0,1,0,0, S=15, details = T, xreg = covariates, Model = T)
 n3= sarima(Number, 1,0,0,1,0,0, S=5, details = T, xreg = covariates, Model = T)
 n4= sarima(Number, 1,0,0,1,0,0, S=15, details = T, xreg = covariates, Model = T)
 n5 = sarima(Number, 1,0,0,3,0,0, S=5, details = T, xreg = covariates, Model = T)
 n6 = sarima(Number, 3,0,0,1,0,0, S=5, details = T, xreg = covariates, Model = T)
+
+###############SET FINAL ARMA PARAMS###################
+#set arima and forecast params
+
+weight.params = list(order =c(0,0,0), seasonal = c(1,0,0))
+weight.title = "SARMA(0,0,0)(1,0,0)[5] 10-Day Forecast"
+
+volume.params = list(order =c(0,1,1), seasonal = c(1,0,0))
+volume.title = "SARMA(0,1,1)(1,0,0)[5] 10-Day Forecast"
+
+number.params = list(order = c(0,0,0), seasonal = c(1,0,0))
+number.title = "SARMA(0,0,0)(1,0,0)[5] 10-Day Forecast"
+
+
+arima.weight = arima(Weight, order = weight.params$order, 
+                     seasonal = list(order = weight.params$seasonal, period = 5),
+                     xreg = covariates,
+                     include.mean = T)
+
+
+arima.volume = arima(Volume, order = volume.params$order, 
+                     seasonal = list(order = volume.params$seasonal, period = 5),
+                     xreg = covariates,
+                     include.mean = T)
+
+arima.number = arima(Number, order = number.params$order, 
+                     seasonal = list(order = number.params$seasonal, period = 5),
+                     xreg = covariates,
+                     include.mean = T)
+
+stargazer(arima.weight, arima.volume, arima.number, type = "text", model.names = T)
 
 ####Make Forecasts
 # for empty forecast data
@@ -174,6 +162,8 @@ forecast.covariates = matrix(NA, 10, 5)
 forecast.covariates = last(covariates, 10)
 forecast.covariates$Outlier = 0
 
+forecast.covariates.out = last(covariates, 10)
+
 #drop last 10 obs
 forecastdat = first(seriesdat, (nrow(seriesdat)-10))
 
@@ -186,37 +176,40 @@ pred1 = predict(reg1f, newdata = forecast.covariates)
 pred2 = predict(reg2f, newdata = forecast.covariates)
 pred3 = predict(reg3f, newdata = forecast.covariates)
 
+pred1o = predict(reg1f, newdata = forecast.covariates.out)
+pred2o = predict(reg2f, newdata = forecast.covariates.out)
+pred3o = predict(reg3f, newdata = forecast.covariates.out)
+
 #for plotting
-`Static Forecast: Weight` = cbind(to.daily(as.xts(pred1))[,1], to.daily(actual$Weight)[,1])
-colnames(`Static Forecast: Weight`) = c("Predicted", "Actual")
+`Static Forecast: Weight` = cbind(to.daily(as.xts(pred1))[,1], to.daily(actual$Weight)[,1], to.daily(as.xts(pred1o))[,1])
+colnames(`Static Forecast: Weight`) = c("Predicted", "Actual", "Predicted with Outlier")
 
-`Static Forecast: Volume` = cbind(to.daily(as.xts(pred2))[,1], to.daily(actual$Volume)[,1])
-colnames(`Static Forecast: Volume`) = c("Predicted", "Actual")
+`Static Forecast: Volume` = cbind(to.daily(as.xts(pred2))[,1], to.daily(actual$Volume)[,1], to.daily(as.xts(pred2o))[,1])
+colnames(`Static Forecast: Volume`) = c("Predicted", "Actual", "Predicted with Outlier")
 
-`Static Forecast: Number` = cbind(to.daily(as.xts(pred3))[,1], to.daily(actual$Number)[,1])
-colnames(`Static Forecast: Number`) = c("Predicted", "Actual")
+`Static Forecast: Number` = cbind(to.daily(as.xts(pred3))[,1], to.daily(actual$Number)[,1], to.daily(as.xts(pred3o))[,1])
+colnames(`Static Forecast: Number`) = c("Predicted", "Actual", "Predicted with Outlier")
 
 plot.xts(`Static Forecast: Weight`, legend.loc = "topleft")
 plot.xts(`Static Forecast: Volume`, legend.loc = "topleft")
 plot.xts(`Static Forecast: Number`, legend.loc = "topleft")
 
-Metrics::rmse(actual$Weight, pred1)
-Metrics::rmse(actual$Volume, pred2)
-Metrics::rmse(actual$Number, pred3)
-
 ###Dynamic
 
 #weight
 wf = predict(arima.weight, n.ahead = 10, newxreg = forecast.covariates)
-wf1 = sarima.for(Weight, 10, 5,0,0, 3,0,0, S=5, details = T, newxreg = forecast.covariates, xreg = covariates)
+wfo = predict(arima.weight, n.ahead = 10, newxreg = forecast.covariates.out)
+wf1 = sarima.for(Weight, 10, 0,0,0, 1,0,0, S=5, details = T, newxreg = forecast.covariates, xreg = covariates)
 
 #volume
 vf = predict(arima.volume, n.ahead = 10, newxreg = forecast.covariates)
-vf1 = sarima.for(Volume, 10, 0,0,0, 3,0,0, S=5, details = T, newxreg = forecast.covariates, xreg = covariates)
+vfo = predict(arima.volume, n.ahead = 10, newxreg = forecast.covariates.out)
+vf1 = sarima.for(Volume, 10, 0,1,1, 1,0,0, S=5, details = T, newxreg = forecast.covariates, xreg = covariates)
 
 #number
 nf = predict(arima.number, n.ahead = 10, newxreg = forecast.covariates)
-nf1 = sarima.for(Number,10, 5,0,0,3,0,0, S=5, newxreg = forecast.covariates, xreg = covariates)
+nfo = predict(arima.number, n.ahead = 10, newxreg = forecast.covariates.out)
+nf1 = sarima.for(Number,10, 0,0,0,1,0,0, S=5, newxreg = forecast.covariates, xreg = covariates)
 
 #xts fuckery
 wf.pred = as.xts(wf$pred)
@@ -226,51 +219,46 @@ index(vf.pred) = index(actual)
 nf.pred = as.xts(nf$pred)
 index(nf.pred) = index(actual)
 
-`Dynamic Forecast: Weight` = cbind(wf.pred, actual$Weight)
-colnames(`Dynamic Forecast: Weight`) = c("Predicted", "Actual")
+wfo.pred = as.xts(wfo$pred)
+index(wfo.pred) = index(actual)
+vfo.pred = as.xts(vfo$pred)
+index(vfo.pred) = index(actual)
+nfo.pred = as.xts(nfo$pred)
+index(nfo.pred) = index(actual)
 
-`Dynamic Forecast: Volume` = cbind(vf.pred, actual$Volume)
-colnames(`Dynamic Forecast: Volume`) = c("Predicted", "Actual")
+`Dynamic Forecast: Weight` = cbind(wf.pred, actual$Weight, wfo.pred)
+colnames(`Dynamic Forecast: Weight`) = c("Predicted", "Actual", "Predicted with Outlier")
 
-`Dynamic Forecast: Number` = cbind(nf.pred, actual$Number)
-colnames(`Dynamic Forecast: Number`) = c("Predicted", "Actual")
+`Dynamic Forecast: Volume` = cbind(vf.pred, actual$Volume, vfo.pred)
+colnames(`Dynamic Forecast: Volume`) = c("Predicted", "Actual", "Predicted with Outlier")
+
+`Dynamic Forecast: Number` = cbind(nf.pred, actual$Number, nfo.pred)
+colnames(`Dynamic Forecast: Number`) = c("Predicted", "Actual", "Predicted with Outlier")
 
 plot.xts(`Dynamic Forecast: Weight`, legend.loc = "topleft")
 plot.xts(`Dynamic Forecast: Volume`, legend.loc = "topleft")
 plot.xts(`Dynamic Forecast: Number`, legend.loc = "topleft")
 
-Metrics::rmse(actual$Weight, wf$pred)
-Metrics::rmse(actual$Volume, vf$pred)
-Metrics::rmse(actual$Number, nf$pred)
 
 ###COMBINE FOR PLOTS
-`Forecast: Weight` = cbind(to.daily(as.xts(pred1))[,1], wf.pred)
-colnames(`Forecast: Weight`) = c("Pred. (Static)", "Pred. (Dynamic)")
+`Forecast: Weight` = cbind(to.daily(as.xts(pred1))[,1], to.daily(wf.pred)[,1], to.daily(as.xts(pred1o))[,1], to.daily(wfo.pred)[,1])
+colnames(`Forecast: Weight`) = c("Pred. (Static)", "Pred. (Dynamic)", 
+                                 "Pred. (Static with Outlier)", "Pred. (Dynamic with Outlier)")
 
-`Forecast: Volume` = cbind(to.daily(as.xts(pred2))[,1], vf.pred)
-colnames(`Forecast: Volume`) = c("Pred. (Static)", "Pred. (Dynamic)")
+`Forecast: Volume` = cbind(to.daily(as.xts(pred2))[,1], to.daily(vf.pred)[,1], to.daily(as.xts(pred2o))[,1], to.daily(vfo.pred)[,1])
+colnames(`Forecast: Volume`) = c("Pred. (Static)", "Pred. (Dynamic)", 
+                                 "Pred. (Static with Outlier)", "Pred. (Dynamic with Outlier)")
 
-`Forecast: Number` = cbind(to.daily(as.xts(pred3))[,1], nf.pred)
-colnames(`Forecast: Number`) = c("Pred. (Static)", "Pred. (Dynamic)")
-
-#empty xts frame
-empty = as.xts(matrix(0,10,3), order.by = index(actual))
-colnames(empty) = c("Weight", "Volume", "Number")
-empty$Weight = actual$Weight
-empty$Volume = actual$Volume
-empty$Number = actual$Number
-
-plot.xts(empty, multi.panel = T, yaxis.same = F, col = 4, legend.loc = "topleft")
-lines(`Forecast: Weight`, on = 1, col = 1:2, legend.loc = "topleft")
-lines(`Forecast: Volume`, on = 2, col = 1:2, legend.loc = "topleft")
-lines(`Forecast: Number`, on = 3, col = 1:2, legend.loc = "topleft")
+`Forecast: Number` = cbind(to.daily(as.xts(pred3))[,1], to.daily(nf.pred)[,1], to.daily(as.xts(pred3o))[,1], to.daily(nfo.pred)[,1])
+colnames(`Forecast: Number`) = c("Pred. (Static)", "Pred. (Dynamic)", 
+                                 "Pred. (Static with Outlier)", "Pred. (Dynamic with Outlier)")
 
 
-#GGplot
+#prep ggplot
 plotdat = rbind(cbind(actual$Weight, `Forecast: Weight`, rep(1,10)), 
                 cbind(actual$Volume, `Forecast: Volume`, rep(2,10)),
                 cbind(actual$Number, `Forecast: Number`, rep(3,10)) )
-colnames(plotdat) = c("Actual","Static Forecast", "Dynamic Forecast", "Var")
+colnames(plotdat) = c("Actual","Static Forecast", "Dynamic Forecast","Static Forecast with Outlier", "Dynamic Forecast with Outlier", "Var")
 
 plotdat = as.data.frame(plotdat)
 dates = index(actual)
@@ -280,8 +268,8 @@ pd= as.data.table(plotdat)
 pd$Var[pd$Var==1] <- "Weight"
 pd$Var[pd$Var==2] <- "Volume"
 pd$Var[pd$Var==3] <- "Number"
-as.factor(pd$Var)
-pd = melt(pd, id.vars = 4:5, measure.vars = 1:3)
+pd$Var = as.factor(pd$Var)
+pd = melt(pd, id.vars = 6:7, measure.vars = 1:5)
 
 source("Plots.R", echo = F)
 
@@ -301,7 +289,6 @@ file.copy('OR_Data_Cleaning.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/C
 knitr::write_bib(c(.packages()),
                  "/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/packages.bib")
 
-# grateful::cite_packages(output = "paragraph", dependencies = T, include.RStudio = T, 
-#                         out.dir = "/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/",
-#                         bib.file = "grateful.bib")
+pkgmat = grateful::get_pkgs_info(dependencies = T)[,1:2]
+
 }
