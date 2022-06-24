@@ -113,6 +113,19 @@ print(xtable(rmse.mat, caption = "RMSE of Forecast Models",
              digits = c(0,2,2,2,2)),
       file = "rmse", floating = T, table.placement = "H", caption.placement = "top" )
 
+arma.n.mat = matrix(NA, 3, 2)
+rownames(arma.n.mat) = c("Weight", "Volume", "Number")
+colnames(arma.n.mat) = c("JB Statistic", "p-value")
+
+arma.n.mat[1,] = c(jarque.bera.test(arima.weight$residuals)$statistic, jarque.bera.test(arima.weight$residuals)$p.value)
+arma.n.mat[1,] = c(jarque.bera.test(arima.volume$residuals)$statistic, jarque.bera.test(arima.volume$residuals)$p.value)
+arma.n.mat[1,] = c(jarque.bera.test(arima.number$residuals)$statistic, jarque.bera.test(arima.number$residuals)$p.value)
+
+print(xtable(arma.n.mat, caption = "ARMA Residual Normality Test",
+             label = "arima.norm",
+             align = "l|c|c",
+             digits = c(0,3,3)),
+      file = "arnmanorn", floating = T, table.placement = "H", caption.placement = "top" )
 
 #back to regular wd
 rm(list=ls(pattern="lb"))

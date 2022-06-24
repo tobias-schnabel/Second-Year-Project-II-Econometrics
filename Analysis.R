@@ -187,6 +187,7 @@ if (Sys.info()[7] == "ts") {
   png("misspecnumber.png", width = 16, height = 12, units = "cm", res = 800)
   print(checkresiduals(arima.number))
   dev.off() 
+  setwd(Paths[Sys.info()[7]])
 }
 
 
