@@ -171,6 +171,25 @@ coeftest = function(model) {
 f.w = coeftest(arima.weight)
 f.v = coeftest(arima.volume)
 f.n = coeftest(arima.number)
+
+##Misspec tests for final model
+if (Sys.info()[7] == "ts") {
+  setwd("/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures")
+  
+  png("misspecweight.png", width = 16, height = 12, units = "cm", res = 800)
+  print(checkresiduals(arima.weight))
+  dev.off() 
+  
+  png("misspecvolume.png", width = 16, height = 12, units = "cm", res = 800)
+  print(checkresiduals(arima.volume))
+  dev.off() 
+  
+  png("misspecnumber.png", width = 16, height = 12, units = "cm", res = 800)
+  print(checkresiduals(arima.number))
+  dev.off() 
+}
+
+
 ####Make Forecasts
 # for empty forecast data
 

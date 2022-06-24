@@ -113,27 +113,9 @@ print(xtable(rmse.mat, caption = "RMSE of Forecast Models",
              digits = c(0,2,2,2,2)),
       file = "rmse", floating = T, table.placement = "H", caption.placement = "top" )
 
-#SARMA diagnostics
-#White tests
-het.mat.sarma = matrix(NA, 3, 4)
-rownames(het.mat.sarma) = c("Weight", "Volume", "Number")
-colnames(het.mat.sarma) = c("Statistic, No Cross-Terms", "p-value, No Cross-Terms", "Statistic, Cross-Terms", "p-value, Cross-Terms")
-
-het.mat.sarma[1,] = c(wt1$statistic, wt1$p.value, wt1i$statistic, wt1i$p.value)
-het.mat.sarma[2,] = c(wt2$statistic, wt2$p.value, wt1i$statistic, wt2i$p.value)
-het.mat.sarma[3,] = c(wt3$statistic, wt3$p.value, wt1i$statistic, wt3i$p.value)
-
-print(xtable(het.mat, caption = "White Tests for Heteroskedasticity in Regresion Residuals",
-             label = "White",
-             align = "l|c|c|c|c",
-             digits = c(0,3,5,3,5)),
-      file = "whitetable", floating = T, table.placement = "H", caption.placement = "top" )
-
-
-rm(list=ls(pattern="lb"))
-rm(list=ls(pattern="wt"))
-
 
 #back to regular wd
+rm(list=ls(pattern="lb"))
+rm(list=ls(pattern="wt"))
 setwd(Paths[Sys.info()[7]])
 
