@@ -150,6 +150,32 @@ arima.number = arima(Number, order = number.params$order,
 
 stargazer(arima.weight, arima.volume, arima.number, type = "text", model.names = T)
 
+###Test Coefficient restrictions
+coeftest = function(model) {
+  #4 restrictions
+  J = 4
+  R = matrix(c(0,1,0,0,0,0,0, 0,0,0,1,0,0,0, 0,0,0,0,1,0,0, 
+               0,0,0,0,0,1,0, 0,0,0,0,0,0,1), ncol = 7, byrow = T)
+  
+  vcovm = vcov(model)
+  c = as.matrix(t(t(coef(model))))
+  step1 = R %*% c
+  meat = R %*% vcovm %*% t(R)
+  step2 = t(step1) %*% meat %*% step1
+  F.stat = step2/J 
+  f.df1 = 4
+  f.df2 = model$nobs
+  F.crit = qf(p=.05, df1=f.df1, df2=f.df2, lower.tail=FALSE)
+  F.p = pf(F.stat, df1=f.df1, df2=f.df2, lower.tail=FALSE)
+  return(list(stat = F.stat, crit = F.crit, p = F.p))
+}
+#weight
+
+f.w = coeftest(arima.weight)
+f.v = coeftest(arima.volume)
+f.n = coeftest(arima.number)
+
+
 ####Make Forecasts
 # for empty forecast data
 

@@ -57,6 +57,21 @@ print(xtable(het.mat, caption = "White Tests for Heteroskedasticity in Regresion
              digits = c(0,3,5,3,5)),
       file = "whitetable", floating = T, table.placement = "H", caption.placement = "top" )
 
+#F-tests
+f.mat = matrix(NA, 3, 3)
+rownames(f.mat) = c("Weight", "Volume", "Number")
+colnames(f.mat) = c("F-statistic", "95% Crit. Value", "p-value")
+
+f.mat[1,] = c(f.w$stat, f.w$crit, f.w$p)
+f.mat[2,] = c(f.v$stat, f.v$crit, f.v$p)
+f.mat[3,] = c(f.n$stat, f.n$crit, f.n$p)
+
+print(xtable(f.mat, caption = "F-Tests for Coefficient Restrictions",
+             label = "f",
+             align = "l|c|c|c",
+             digits = c(0,3,3,3)),
+      file = "ftable", floating = T, table.placement = "H", caption.placement = "top" )
+
 #baseline regs
 stargazer(reg1, reg2, reg3, type = "latex",
           out = "regs",

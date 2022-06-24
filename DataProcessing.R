@@ -55,12 +55,12 @@ plot.xts(seriesdat[, c(1,2,3,5)], multi.panel = T, yaxis.same = F, main = "Outli
 
 #make copy of data with outliers of 2 SD droped
 copy = markoutliers(2)
-stat = as.xts.data.table(copy[Outlier == 0, 1:5])
+stat = as.xts.data.table(copy[Outlier == 0, 1:4])
 stat$mw = mean(stat$Weight)
 stat$mnumber = mean(stat$Number)
 stat$mv = mean(stat$Volume)
 
-xtsp1 = plot.xts(stat[, 1:4], multi.panel = T, yaxis.same = F, main = "")
+xtsp1 = plot.xts(stat[, 1:3], multi.panel = T, yaxis.same = F, main = "")
 lines(stat[, "mw"], on=1, lty = "dashed")
 lines(stat[, "mv"], on=2, lty = "dashed")
 lines(stat[, "mnumber"], on=3, lty = "dashed")
