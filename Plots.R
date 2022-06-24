@@ -109,9 +109,7 @@ fccomp = ggplot(pd, aes(x = Date, y=value, color = variable)) +
         panel.grid.minor = element_blank(),
         legend.position = "bottom")
 
-
-
-ggsave("forecasts.png", plot = fccomp, dpi = 800, width = 12, height = 20, units = "cm")
+ggsave("forecasts.png", plot = fccomp, dpi = 800, width = 25, height = 20, units = "cm")
 
 #ind fc
 wfp = autoplot(forecast(Arima(Weight, weight.params$order, weight.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
