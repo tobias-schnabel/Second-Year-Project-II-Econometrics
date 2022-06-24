@@ -137,7 +137,6 @@ arima.weight = arima(Weight, order = weight.params$order,
                      xreg = covariates,
                      include.mean = T)
 
-
 arima.volume = arima(Volume, order = volume.params$order, 
                      seasonal = list(order = volume.params$seasonal, period = 5),
                      xreg = covariates,
@@ -156,7 +155,6 @@ coeftest = function(model) {
   J = 4
   R = matrix(c(0,1,0,0,0,0,0, 0,0,0,1,0,0,0, 0,0,0,0,1,0,0, 
                0,0,0,0,0,1,0, 0,0,0,0,0,0,1), ncol = 7, byrow = T)
-  
   vcovm = vcov(model)
   c = as.matrix(t(t(coef(model))))
   step1 = R %*% c
@@ -169,13 +167,10 @@ coeftest = function(model) {
   F.p = pf(F.stat, df1=f.df1, df2=f.df2, lower.tail=FALSE)
   return(list(stat = F.stat, crit = F.crit, p = F.p))
 }
-#weight
 
 f.w = coeftest(arima.weight)
 f.v = coeftest(arima.volume)
 f.n = coeftest(arima.number)
-
-
 ####Make Forecasts
 # for empty forecast data
 
@@ -188,7 +183,7 @@ forecast.covariates = matrix(NA, 10, 5)
 forecast.covariates = last(covariates, 10)
 forecast.covariates$Outlier = 0
 
-forecast.covariates.out = last(covariates, 10)
+forecast.covariates.out = last(covariates, 10) #this one includes the outlier
 
 #drop last 10 obs
 forecastdat = first(seriesdat, (nrow(seriesdat)-10))
@@ -221,17 +216,14 @@ plot.xts(`Static Forecast: Volume`, legend.loc = "topleft")
 plot.xts(`Static Forecast: Number`, legend.loc = "topleft")
 
 ###Dynamic
-
 #weight
 wf = predict(arima.weight, n.ahead = 10, newxreg = forecast.covariates)
 wfo = predict(arima.weight, n.ahead = 10, newxreg = forecast.covariates.out)
 wf1 = sarima.for(Weight, 10, 0,0,0, 1,0,0, S=5, details = T, newxreg = forecast.covariates, xreg = covariates)
-
 #volume
 vf = predict(arima.volume, n.ahead = 10, newxreg = forecast.covariates)
 vfo = predict(arima.volume, n.ahead = 10, newxreg = forecast.covariates.out)
 vf1 = sarima.for(Volume, 10, 0,1,1, 1,0,0, S=5, details = T, newxreg = forecast.covariates, xreg = covariates)
-
 #number
 nf = predict(arima.number, n.ahead = 10, newxreg = forecast.covariates)
 nfo = predict(arima.number, n.ahead = 10, newxreg = forecast.covariates.out)
@@ -244,7 +236,6 @@ vf.pred = as.xts(vf$pred)
 index(vf.pred) = index(actual)
 nf.pred = as.xts(nf$pred)
 index(nf.pred) = index(actual)
-
 wfo.pred = as.xts(wfo$pred)
 index(wfo.pred) = index(actual)
 vfo.pred = as.xts(vfo$pred)
@@ -265,7 +256,6 @@ plot.xts(`Dynamic Forecast: Weight`, legend.loc = "topleft")
 plot.xts(`Dynamic Forecast: Volume`, legend.loc = "topleft")
 plot.xts(`Dynamic Forecast: Number`, legend.loc = "topleft")
 
-
 ###COMBINE FOR PLOTS
 `Forecast: Weight` = cbind(to.daily(as.xts(pred1))[,1], to.daily(wf.pred)[,1], to.daily(as.xts(pred1o))[,1], to.daily(wfo.pred)[,1])
 colnames(`Forecast: Weight`) = c("Pred. (Static)", "Pred. (Dynamic)", 
@@ -278,7 +268,6 @@ colnames(`Forecast: Volume`) = c("Pred. (Static)", "Pred. (Dynamic)",
 `Forecast: Number` = cbind(to.daily(as.xts(pred3))[,1], to.daily(nf.pred)[,1], to.daily(as.xts(pred3o))[,1], to.daily(nfo.pred)[,1])
 colnames(`Forecast: Number`) = c("Pred. (Static)", "Pred. (Dynamic)", 
                                  "Pred. (Static with Outlier)", "Pred. (Dynamic with Outlier)")
-
 
 #prep ggplot
 plotdat = rbind(cbind(actual$Weight, `Forecast: Weight`, rep(1,10)), 
@@ -315,6 +304,6 @@ file.copy('OR_Data_Cleaning.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/C
 knitr::write_bib(c(.packages()),
                  "/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/packages.bib")
 
-pkgmat = grateful::get_pkgs_info(dependencies = T)[,1:2]
+# pkgmat = grateful::get_pkgs_info(dependencies = T)[,1:2]
 
 }
