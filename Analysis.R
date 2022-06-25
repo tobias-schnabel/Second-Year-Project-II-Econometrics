@@ -122,14 +122,14 @@ n6 = sarima(Number, 3,0,0,1,0,0, S=5, details = T, xreg = covariates, Model = T)
 ###############SET FINAL ARMA PARAMS###################
 #set arima and forecast params
 
-weight.params = list(order =c(0,0,0), seasonal = c(1,0,0))
-weight.title = "SARMA(0,0,0)(1,0,0)[5] 10-Day Forecast"
+weight.params = list(order =c(0,0,0), seasonal = c(2,0,1))
+weight.title = "SARMA(0,0,0)(2,0,1)[5] 10-Day Forecast"
 
-volume.params = list(order =c(0,1,1), seasonal = c(1,0,0))
-volume.title = "SARMA(0,1,1)(1,0,0)[5] 10-Day Forecast"
+volume.params = list(order =c(0,0,0), seasonal = c(1,0,0))
+volume.title = "SARMA(0,0,0)(1,0,0)[5] 10-Day Forecast"
 
-number.params = list(order = c(0,0,0), seasonal = c(1,0,0))
-number.title = "SARMA(0,0,0)(1,0,0)[5] 10-Day Forecast"
+number.params = list(order = c(0,0,0), seasonal = c(2,0,1))
+number.title = "SARMA(0,0,0)(2,0,1)[5] 10-Day Forecast"
 
 
 arima.weight = arima(Weight, order = weight.params$order, 
