@@ -320,6 +320,13 @@ file.copy('Plots.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', overw
 file.copy('Tables.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', overwrite = T)
 file.copy('OR_Data_Cleaning.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', overwrite = T)
 
+file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', "/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/", 
+          overwrite = T, recursive = T)
+file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures', "/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/", 
+          overwrite = T, recursive = T)
+file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Tables', "/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/", 
+          overwrite = T, recursive = T)
+
 #credit OSS authors
 knitr::write_bib(c(.packages()),
                  "/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/packages.bib")
