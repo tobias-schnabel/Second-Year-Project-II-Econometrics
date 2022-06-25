@@ -111,23 +111,51 @@ fccomp = ggplot(pd, aes(x = Date, y=value, color = variable)) +
 
 ggsave("forecasts.png", plot = fccomp, dpi = 800, width = 25, height = 20, units = "cm")
 
-#ind fc
-wfp = autoplot(forecast(Arima(Weight, weight.params$order, weight.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
+
+###Whole-sample forecasts
+#extend time series by 10 days
+my_periodicity = unclass(periodicity(seriesdat))$label
+add_right = 14
+newdates = seq(as.Date(end(seriesdat)),
+                   by = my_periodicity,
+                   length.out = (add_right+1))[-1]
+indexexpand = xts(order.by = newdates)
+
+forecast.data = merge.xts(seriesdat, indexexpand)
+forecast.data$monday = 0
+forecast.data$tuesday = 0
+forecast.data$wednesday = 0
+forecast.data$thursday = 0
+forecast.data$friday = 0
+
+forecast.data$monday[.indexwday(forecast.data) == 1] = 1
+forecast.data$tuesday[.indexwday(forecast.data) == 2] = 1
+forecast.data$wednesday[.indexwday(forecast.data) == 3] = 1
+forecast.data$thursday[.indexwday(forecast.data) == 4] = 1
+forecast.data$friday[.indexwday(forecast.data) == 5] = 1
+
+forecast.dat = forecast.data[.indexwday(forecast.data) %in% 1:5]
+forecast.covariates.fullsample = last(forecast.dat[, c(5,7,8,9,10)], 10)
+forecast.covariates.fullsample$Outlier = 0
+fdat = last(forecast.dat, 10)
+
+#dynamic forecasts whole sample
+wfp = autoplot(forecast(Arima(Weight, weight.params$order, weight.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
   ggtitle(weight.title) + theme_minimal() + xlab("Date") + theme(axis.text.x = element_blank()) + xlim(100,215)
 
-vfp = autoplot(forecast(Arima(Volume, volume.params$order, volume.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
+vfp = autoplot(forecast(Arima(Volume, volume.params$order, volume.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
   ggtitle(volume.title) + theme_minimal() + xlab("Date") + theme(axis.text.x = element_blank()) + xlim(100,215)
 
-nfp = autoplot(forecast(Arima(Number, number.params$order, number.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
+nfp = autoplot(forecast(Arima(Number, number.params$order, number.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
   ggtitle(number.title) + theme_minimal() + xlab("Date") + theme(axis.text.x = element_blank())+ xlim(100,215)
 
-wfpp = autoplot(forecast(Arima(Weight, weight.params$order, weight.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
+wfpp = autoplot(forecast(Arima(Weight, weight.params$order, weight.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
   ggtitle(weight.title) + theme_minimal() + xlab("") + theme(axis.text.x = element_blank()) + xlim(150,215)
 
-vfpp = autoplot(forecast(Arima(Volume, volume.params$order, volume.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
+vfpp = autoplot(forecast(Arima(Volume, volume.params$order, volume.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
   ggtitle(volume.title) + theme_minimal() + xlab("") + theme(axis.text.x = element_blank()) + xlim(150,215)
 
-nfpp = autoplot(forecast(Arima(Number, number.params$order, number.params$seasonal, xreg = covariates), xreg = forecast.covariates)) + 
+nfpp = autoplot(forecast(Arima(Number, number.params$order, number.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
   ggtitle(number.title) + theme_minimal() + xlab("") + theme(axis.text.x = element_blank())+ xlim(150,215)
 
 
