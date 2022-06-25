@@ -172,6 +172,10 @@ coeftest = function(model) {
   return(list(stat = F.stat, crit = F.crit, p = F.p))
 }
 
+f.w = coeftest(arima.weight)
+f.v = coeftest(arima.volume)
+f.n = coeftest(arima.number)
+
 ##Misspec tests for final model
 if (Sys.info()[7] == "ts") {
   setwd("/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures")
