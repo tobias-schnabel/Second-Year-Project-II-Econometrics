@@ -74,7 +74,7 @@ print(xtable(f.mat, caption = "F-Tests for Coefficient Restrictions",
 
 #baseline regs
 stargazer(reg1, reg2, reg3, type = "latex",
-          out = "regs",
+          out = "regs", label = "regs",
           title = "Baseline Regression Results",
           digits = 4, float = T, model.names = T)
 

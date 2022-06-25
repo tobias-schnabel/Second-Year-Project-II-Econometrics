@@ -92,11 +92,11 @@ ts.volume = ts(seriesdat$Volume, frequency = 5)
 ts.number = ts(seriesdat$Number, frequency = 5)
 
 require(forecast)
-aaw = auto.arima(ts.weight, seasonal = T, parallel = T, xreg = covariates)
+aaw = auto.arima(ts.weight, seasonal = T, stationary = T,parallel = T, xreg = covariates)
 
-aav = auto.arima(ts.volume, seasonal = T, parallel = T, xreg = covariates)
+aav = auto.arima(ts.volume, seasonal = T, stationary = T, parallel = T, xreg = covariates)
 
-aan = auto.arima(ts.number, seasonal = T, parallel = T, xreg = covariates)
+aan = auto.arima(ts.number, seasonal = T, stationary = T,parallel = T, xreg = covariates)
 
 #manual
 require(astsa)
