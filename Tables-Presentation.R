@@ -1,6 +1,6 @@
-##Tables
+##Tables for Presentation
 if (Sys.info()[7] == "ts") {
-  setwd("/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Tables")
+  setwd("/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/Tables")
 }
 
 #LM tests
@@ -17,45 +17,7 @@ print(xtable(lm.mat, caption = "LM Tests of Regression Residuals",
              digits = c(0,0,3,5)),
       file = "lmtable", floating = T, table.placement = "H", caption.placement = "top" )
 
-#Q-tests
-q.mat = matrix(NA, 9, 2)
-colnames(q.mat) = c("Q-Statistic", "p-value")
-rownames(q.mat) = c("Weight, 5 Lags", "Volume, 5 Lags", "Number, 5 Lags",
-                    "Weight, 15 Lags", "Volume, 15 Lags", "Number, 15 Lags",
-                    "Weight, 25 Lags", "Volume, 25 Lags", "Number, 25 Lags")
-                        
-q.mat[1,] = c(lb11$statistic, lb11$p.value)
-q.mat[2,] = c(lb21$statistic, lb21$p.value)
-q.mat[3,] = c(lb31$statistic, lb31$p.value)
 
-q.mat[4,] = c(lb12$statistic, lb12$p.value)
-q.mat[5,] = c(lb22$statistic, lb22$p.value)
-q.mat[6,] = c(lb32$statistic, lb32$p.value)
-
-q.mat[7,] = c(lb13$statistic, lb13$p.value)
-q.mat[8,] = c(lb23$statistic, lb23$p.value)
-q.mat[9,] = c(lb33$statistic, lb33$p.value)
-
-print(xtable(q.mat, caption = "Q-Tests of Regresion Residuals",
-             label = "Q",
-             align = "l|c|c",
-             digits = c(0,3,5)),
-file = "qtable", floating = T, table.placement = "H", caption.placement = "top", hline.after = c(-1,0,3,6,9))
-
-#White tests
-het.mat = matrix(NA, 3, 4)
-rownames(het.mat) = c("Weight", "Volume", "Number")
-colnames(het.mat) = c("Stat, No CT", "p-value, No CT", "Statistic, CT", "p-value, CT")
-
-het.mat[1,] = c(wt1$statistic, wt1$p.value, wt1i$statistic, wt1i$p.value)
-het.mat[2,] = c(wt2$statistic, wt2$p.value, wt1i$statistic, wt2i$p.value)
-het.mat[3,] = c(wt3$statistic, wt3$p.value, wt1i$statistic, wt3i$p.value)
-
-print(xtable(het.mat, caption = "White Tests for Heteroskedasticity in Regresion Residuals",
-             label = "White",
-             align = "l|c|c|c|c",
-             digits = c(0,3,5,3,5)),
-      file = "whitetable", floating = T, table.placement = "H", caption.placement = "top" )
 
 #F-tests
 f.mat = matrix(NA, 3, 3)
@@ -74,24 +36,22 @@ print(xtable(f.mat, caption = "F-Tests for Coefficient Restrictions",
 
 #baseline regs
 stargazer(reg1, reg2, reg3, type = "latex",
-          out = "regs", label = "regs",
+          out = "regs", label = "regs", single.row = T,
           title = "Baseline Regression Results",
           digits = 4, float = T, model.names = T)
 
 #arma(0,0)(0,0)
 stargazer(bw, bv, bn, type = "latex",
-          out = "arma00", label = "arma00",
+          out = "arma00", label = 'arma00', single.row = T,
           title = "ARMA(0,0)(0,0) Estimation Results",
           digits = 4, float = T, model.names = T)
 
 #arima models
 stargazer(arima.weight, arima.volume, arima.number, type = "latex",
           title = "ARMA(p,q)(P,Q) Estimation Results",
-          out = "arma", label = "arma",
+          out = "arma", label = "arma", single.row = T,
           digits = 4, float = T, model.names = T)
- 
-# covariate.labels = c("AR(1)", "AR(2)", "AR(3)", "AR(4)", "AR(5)",
-#                      "Outlier", "Tueday", "Wednesday", "Thursday", "Friday"),
+
 
 ##RMSE Tables
 rmse.mat = matrix(NA, 4,3)
@@ -129,34 +89,14 @@ print(xtable(arma.n.mat, caption = "ARMA Residual Normality Test",
       file = "arnmanorn", floating = T, table.placement = "H", caption.placement = "top" )
 
 
-####IC Comp
-##IC comparison Table
-ic.wb = sarima(Weight, 0,0,0, 0,0,0, 5, details = F, xreg = covariates, Model = T)
-ic.vb = sarima(Volume, 0,0,0, 0,0,0, 5, details = F, xreg = covariates, Model = T)
-ic.nb = sarima(Number, 0,0,0, 0,0,0, 5, details = F, xreg = covariates, Model = T)
-
-ic.wf = sarima(Weight, 0,0,2, 2,0,1, 5, details = F, xreg = covariates, Model = T)
-ic.vf = sarima(Volume, 0,0,0, 0,0,0, 5, details = F, xreg = covariates, Model = T)
-ic.nf = sarima(Number, 0,0,0, 2,0,1, 5, details = F, xreg = covariates, Model = T)
-
-ic.mat = matrix(NA, 3,4)
-rownames(ic.mat) = c("Weight", "Volume", "Number")
-colnames(ic.mat) = c("BIC Baseline", "BIC Final", 'AIC Baseline', "AIC Final")
-
-ic.mat[1,] = c(ic.wb$BIC, ic.wf$BIC, ic.wb$AIC, ic.wf$AIC)
-ic.mat[1,] = c(ic.vb$BIC, ic.vf$BIC, ic.vb$AIC, ic.vf$AIC)
-ic.mat[1,] = c(ic.nb$BIC, ic.nf$BIC, ic.nb$AIC, ic.nf$AIC)
-
-print(xtable(arma.n.mat, caption = "Information Criteria Comparison",
+print(xtable(ic.mat, caption = "Information Criteria Comparison",
              label = "ic",
              align = "l|c|c|c|c",
              digits = c(0,3,3,3,3)),
       file = "iccomp", floating = T, table.placement = "H", caption.placement = "top" )
 
-
 #back to regular wd
 rm(list=ls(pattern="lb"))
 rm(list=ls(pattern="wt"))
 setwd(Paths[Sys.info()[7]])
-source("Tables-Presentation.R", echo = F)
 

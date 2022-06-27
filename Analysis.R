@@ -29,8 +29,6 @@ setwd(Paths[Sys.info()[7]])
 #1 until 2.2:
 source("DataProcessing.R", echo = F)
 
-
-
 #implement LM tests
 lm1 = bgtest(reg1, order = 25)
 lm2 = bgtest(reg2, order = 25)
@@ -108,7 +106,9 @@ w2 = sarima(Weight, 3,0,0, 1,0,0, 5, details = T, xreg = covariates, Model = T)
 
 #Volume
 aav
-v1 = sarima(Volume, 0,1,1, 1,0,0, S=5, details = T, xreg = covariates, Model = T)
+v1 = sarima(Volume, 0,0,0, 1,0,0, S=5, details = F, xreg = covariates, Model = T)
+v2 = sarima(Volume, 0,0,0, 0,0,0, S=5, details = T, xreg = covariates, Model = T)
+v3 = sarima(Volume, 0,0,0, 0,0,1, S=5, details = T, xreg = covariates, Model = T)
 
 #Number
 aan
@@ -125,8 +125,8 @@ n6 = sarima(Number, 3,0,0,1,0,0, S=5, details = T, xreg = covariates, Model = T)
 weight.params = list(order =c(0,0,0), seasonal = c(2,0,1))
 weight.title = "SARMA(0,0,0)(2,0,1)[5] 10-Day Forecast"
 
-volume.params = list(order =c(0,0,0), seasonal = c(1,0,0))
-volume.title = "SARMA(0,0,0)(1,0,0)[5] 10-Day Forecast"
+volume.params = list(order =c(0,0,0), seasonal = c(0,0,0))
+volume.title = "SARMA(0,0,0)(0,0,0)[5] 10-Day Forecast"
 
 number.params = list(order = c(0,0,0), seasonal = c(2,0,1))
 number.title = "SARMA(0,0,0)(2,0,1)[5] 10-Day Forecast"
@@ -139,6 +139,11 @@ arima.weight = arima(Weight, order = weight.params$order,
 
 arima.volume = arima(Volume, order = volume.params$order, 
                      seasonal = list(order = volume.params$seasonal, period = 5),
+                     xreg = covariates,
+                     include.mean = T)
+
+arima.volume2 = arima(Volume, order = volume.params$order, 
+                     seasonal = list(order = c(1,0,0), period = 5),
                      xreg = covariates,
                      include.mean = T)
 
@@ -173,7 +178,7 @@ coeftest = function(model) {
 }
 
 f.w = coeftest(arima.weight)
-f.v = coeftest(arima.volume)
+f.v = coeftest(arima.volume2)
 f.n = coeftest(arima.number)
 
 ##Misspec tests for final model
@@ -193,7 +198,6 @@ if (Sys.info()[7] == "ts") {
   dev.off() 
   setwd(Paths[Sys.info()[7]])
 }
-
 
 ####Make Forecasts
 # for empty forecast data
@@ -315,6 +319,7 @@ source("Plots.R", echo = F)
 #make tables
 source("Tables.R", echo = F)
 
+
 #######export code#####
 if (Sys.info()[7] == "ts") {
   
@@ -328,8 +333,7 @@ file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', "/Users/ts/Dropb
           overwrite = T, recursive = T)
 file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures', "/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/", 
           overwrite = T, recursive = T)
-file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Tables', "/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/", 
-          overwrite = T, recursive = T)
+
 
 #credit OSS authors
 knitr::write_bib(c(.packages()),

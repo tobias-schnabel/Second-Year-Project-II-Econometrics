@@ -167,9 +167,8 @@ ggsave("forecastVolume.png", plot = vfp, dpi = 800, width = 12, height = 12, uni
 ggsave("forecastNumber.png", plot = nfp, dpi = 800, width = 12, height = 12, units = "cm")
 ggsave("forecastPanels.png", plot = fcfexport, dpi = 800, width = 14, height = 16, units = "cm")
 
-#lfw = autoplot(forecast(Arima(Number, c(0,0,0), c(0,0,0), xreg = covariates), xreg = forecast.covariates))
 
-#delete indivudal plots
+#delete individdual plots
 rm(list=ls(pattern="acf"))
 #back to regular wd
 setwd(Paths[Sys.info()[7]])
