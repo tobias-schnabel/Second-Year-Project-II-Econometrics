@@ -333,8 +333,8 @@ file.copy('OR_Data_Cleaning.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/C
 
 file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', "/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/", 
           overwrite = T, recursive = T)
-#file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures', "/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/", 
-         # overwrite = T, recursive = T)
+file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures', "/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/Figures", 
+         overwrite = T, recursive = T)
 
 
 #credit OSS authors

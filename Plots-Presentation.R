@@ -66,7 +66,7 @@ pacf3 = ggPacf(reg3$residuals, color = "red") +
 acp1 = ggarrange(acf1, pacf1, acf3, pacf3, nrow = 2, ncol = 2)
 acp1 = annotate_figure(acp1, bottom = text_grob("Blue Lines denote 95% Confidence Intervals", hjust = 1, x = 1))
 
-ggsave("acp1.png", plot = acp1, dpi = 800, width = 12, height = 16, units = "cm")
+ggsave("acf.png", plot = acp1, dpi = 800, width = 12, height = 16, units = "cm")
 
 #forecasting comparison
 
@@ -109,32 +109,33 @@ forecast.covariates.fullsample$Outlier = 0
 fdat = last(forecast.dat, 10)
 
 #dynamic forecasts whole sample
-wfp = autoplot(forecast(Arima(Weight, weight.params$order, weight.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
-  ggtitle(weight.title) + theme_minimal() + xlab("Date") + theme(axis.text.x = element_blank()) + xlim(100,215)
+p.wfp = autoplot(forecast(Arima(Weight, weight.params$order, weight.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
+  ggtitle(weight.title) + theme_minimal() + xlab("Date") + 
+  theme(axis.text.x = element_blank(), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank()) + 
+  xlim(100,215) + ylim(-1000,4000)
 
-vfp = autoplot(forecast(Arima(Volume, volume.params$order, volume.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
-  ggtitle(volume.title) + theme_minimal() + xlab("Date") + theme(axis.text.x = element_blank()) + xlim(100,215)
+p.vfp = autoplot(forecast(Arima(Volume, volume.params$order, volume.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
+  ggtitle(volume.title) + theme_minimal() + xlab("Date") + 
+  theme(axis.text.x = element_blank(), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank()) + 
+  xlim(100,215) + ylim(-5,35)
 
-nfp = autoplot(forecast(Arima(Number, number.params$order, number.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
-  ggtitle(number.title) + theme_minimal() + xlab("Date") + theme(axis.text.x = element_blank())+ xlim(100,215)
-
-wfpp = autoplot(forecast(Arima(Weight, weight.params$order, weight.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
-  ggtitle(weight.title) + theme_minimal() + xlab("") + theme(axis.text.x = element_blank()) + xlim(150,215)
-
-vfpp = autoplot(forecast(Arima(Volume, volume.params$order, volume.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
-  ggtitle(volume.title) + theme_minimal() + xlab("") + theme(axis.text.x = element_blank()) + xlim(150,215)
-
-nfpp = autoplot(forecast(Arima(Number, number.params$order, number.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
-  ggtitle(number.title) + theme_minimal() + xlab("") + theme(axis.text.x = element_blank())+ xlim(150,215)
+p.nfp = autoplot(forecast(Arima(Number, number.params$order, number.params$seasonal, xreg = covariates), xreg = forecast.covariates.fullsample)) + 
+  ggtitle(number.title) + theme_minimal() + xlab("Date") + 
+  theme(axis.text.x = element_blank(), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank()) + 
+  xlim(100,215) + ylim(-5,20)
 
 
-fcfacet = ggarrange(wfpp, vfpp, nfpp, nrow = 3, ncol = 1) 
-fcfexport = annotate_figure(fcfacet, bottom = text_grob("Blue Lines denote 95% and 80% Prediction Intervals", hjust = 1, x = 1))
+png("WeightFC.png", width = 16, height = 12, units = "cm", res = 800)
+print(p.wfp)
+dev.off()
 
-ggsave("forecastWeight.png", plot = wfp, dpi = 800, width = 12, height = 12, units = "cm")
-ggsave("forecastVolume.png", plot = vfp, dpi = 800, width = 12, height = 12, units = "cm")
-ggsave("forecastNumber.png", plot = nfp, dpi = 800, width = 12, height = 12, units = "cm")
-ggsave("forecastPanels.png", plot = fcfexport, dpi = 800, width = 14, height = 16, units = "cm")
+png("VolumeFC.png", width = 16, height = 12, units = "cm", res = 800)
+print(p.vfp)
+dev.off()
+
+png("NumberFC.png", width = 16, height = 12, units = "cm", res = 800)
+print(p.nfp)
+dev.off()
 
 
 #delete individdual plots
