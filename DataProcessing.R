@@ -80,6 +80,20 @@ if (Sys.info()[7] == "ts") {
   #back to regular wd
   setwd(Paths[Sys.info()[7]])
 }
+if (Sys.info()[7] == "ts") {
+  setwd("/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/Figures")
+  
+  #export
+  png("Outliers.png", width = 10, height = 12, units = "cm", res = 800)
+  print(plot.xts(seriesdat[, c(1,2,3,5)], multi.panel = T, yaxis.same = F, main = ""))
+  dev.off() 
+  
+  png("Stationarity.png", width = 10, height = 12, units = "cm", res = 800)
+  print(xtsp1)
+  dev.off() 
+  #back to regular wd
+  setwd(Paths[Sys.info()[7]])
+}
 
 #rm(stat, lanedat, dat, tsdat)
 #2.2: reg
