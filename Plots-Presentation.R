@@ -20,7 +20,7 @@ statplot = ggplot(data = tidydat, aes(x = Date, y = Value, color = Variable)) +
   geom_hline(data = gmean, aes(yintercept = MN), lty = "dashed") +
   facet_wrap(nrow = 3, vars(Variable), scales = "free") +
   scale_color_tableau() + theme_minimal() + theme(legend.position = "none") 
-  
+
 ggsave("stationarity2.png", plot = statplot, dpi = 800, width = 12, height = 20, units = "cm")
 
 acf_theme = theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
@@ -34,38 +34,7 @@ acf_theme = theme(panel.grid.minor.y = element_line(colour = "lightgrey"),
                   panel.grid.major.x = NULL,
                   panel.background = element_rect(fill = "white"))
 
-#ACF/PACF plots 10 lags
 
-acf12 = ggAcf(reg1$residuals, lag.max = 10, type = "correlation", color = "red") + 
-        acf_theme + ylim(c(-0.2,0.2)) +
-        ggtitle(as.character(model1)[2]) 
-
-pacf12 = ggPacf(reg1$residuals, lag.max = 10, color = "red") + 
-        acf_theme + ylim(c(-0.2,0.2)) +
-        ggtitle(as.character(model1)[2]) 
-
-
-acf22 = ggAcf(reg2$residuals, lag.max = 10, type = "correlation", color = "red") + 
-        acf_theme + ylim(c(-0.2,0.2)) +
-        ggtitle(as.character(model2)[2]) 
-
-pacf22 = ggPacf(reg2$residuals, lag.max = 10, color = "red") + 
-        acf_theme + ylim(c(-0.2,0.2)) +
-        ggtitle(as.character(model2)[2]) 
-
-acf32 = ggAcf(reg3$residuals, lag.max = 10, type = "correlation", color = "red") + 
-        acf_theme + ylim(c(-0.2,0.2)) +
-        ggtitle(as.character(model3)[2]) 
-
-pacf32 = ggPacf(reg3$residuals, lag.max = 10, color = "red") + 
-        acf_theme + ylim(c(-0.2,0.2)) +
-        ggtitle(as.character(model3)[2]) 
-
-#combine
-acp2 = ggarrange(acf12, pacf12, acf22, pacf22, acf32, pacf32, nrow = 3, ncol = 2)
-acp2 = annotate_figure(acp2, bottom = text_grob("Blue Lines denote 95% Confidence Intervals", hjust = 1, x = 1))
-
-ggsave("acp2.png", plot = acp2, dpi = 800, width = 12, height = 20, units = "cm")
 
 #ACF/PACF plots 25 lags
 acf1 = ggAcf(reg1$residuals, type = "correlation", color = "red") + 
@@ -94,10 +63,10 @@ pacf3 = ggPacf(reg3$residuals, color = "red") +
   ggtitle(as.character(model3)[2]) 
 
 #combine
-acp1 = ggarrange(acf1, pacf1, acf2, pacf2, acf3, pacf3, nrow = 3, ncol = 2)
+acp1 = ggarrange(acf1, pacf1, acf3, pacf3, nrow = 2, ncol = 2)
 acp1 = annotate_figure(acp1, bottom = text_grob("Blue Lines denote 95% Confidence Intervals", hjust = 1, x = 1))
 
-ggsave("acp1.png", plot = acp1, dpi = 800, width = 12, height = 20, units = "cm")
+ggsave("acp1.png", plot = acp1, dpi = 800, width = 12, height = 16, units = "cm")
 
 #forecasting comparison
 
@@ -117,8 +86,8 @@ ggsave("forecasts.png", plot = fccomp, dpi = 800, width = 25, height = 20, units
 my_periodicity = unclass(periodicity(seriesdat))$label
 add_right = 14
 newdates = seq(as.Date(end(seriesdat)),
-                   by = my_periodicity,
-                   length.out = (add_right+1))[-1]
+               by = my_periodicity,
+               length.out = (add_right+1))[-1]
 indexexpand = xts(order.by = newdates)
 
 forecast.data = merge.xts(seriesdat, indexexpand)
@@ -172,4 +141,3 @@ ggsave("forecastPanels.png", plot = fcfexport, dpi = 800, width = 14, height = 1
 rm(list=ls(pattern="acf"))
 #back to regular wd
 setwd(Paths[Sys.info()[7]])
-source("Plots-Presentation.R", echo = F)

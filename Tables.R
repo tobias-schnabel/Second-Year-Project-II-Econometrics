@@ -144,10 +144,10 @@ rownames(ic.mat) = c("Weight", "Volume", "Number")
 colnames(ic.mat) = c("BIC Baseline", "BIC Final", 'AIC Baseline', "AIC Final")
 
 ic.mat[1,] = c(ic.wb$BIC, ic.wf$BIC, ic.wb$AIC, ic.wf$AIC)
-ic.mat[1,] = c(ic.vb$BIC, ic.vf$BIC, ic.vb$AIC, ic.vf$AIC)
-ic.mat[1,] = c(ic.nb$BIC, ic.nf$BIC, ic.nb$AIC, ic.nf$AIC)
+ic.mat[2,] = c(ic.vb$BIC, ic.vf$BIC, ic.vb$AIC, ic.vf$AIC)
+ic.mat[3,] = c(ic.nb$BIC, ic.nf$BIC, ic.nb$AIC, ic.nf$AIC)
 
-print(xtable(arma.n.mat, caption = "Information Criteria Comparison",
+print(xtable(ic.mat, caption = "Information Criteria Comparison",
              label = "ic",
              align = "l|c|c|c|c",
              digits = c(0,3,3,3,3)),

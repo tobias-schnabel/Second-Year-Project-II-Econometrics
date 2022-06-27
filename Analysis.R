@@ -101,8 +101,10 @@ require(astsa)
 
 #Weight
 aaw
-w1 = sarima(Weight, 0,0,0, 1,0,0, 5, details = T, xreg = covariates, Model = T)
-w2 = sarima(Weight, 3,0,0, 1,0,0, 5, details = T, xreg = covariates, Model = T)
+w1 = sarima(Weight, 0,0,2, 2,0,1, 5, details = F, xreg = covariates, Model = T)
+w2 = sarima(Weight, 0,0,0, 2,0,1, 5, details = F, xreg = covariates, Model = T)
+w3 = sarima(Weight, 0,0,0, 1,0,1, 5, details = F, xreg = covariates, Model = T)
+w4 = sarima(Weight, 0,0,0, 0,0,0, 5, details = F, xreg = covariates, Model = T)
 
 #Volume
 aav
@@ -331,8 +333,8 @@ file.copy('OR_Data_Cleaning.R', '/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/C
 
 file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Code', "/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/", 
           overwrite = T, recursive = T)
-file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures', "/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/", 
-          overwrite = T, recursive = T)
+#file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures', "/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/", 
+         # overwrite = T, recursive = T)
 
 
 #credit OSS authors
