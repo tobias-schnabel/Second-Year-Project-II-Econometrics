@@ -38,19 +38,19 @@ print(xtable(f.mat, caption = "F-Tests for Coefficient Restrictions",
 stargazer(reg1, reg2, reg3, type = "latex",
           out = "regs", label = "regs", single.row = T,
           title = "Baseline Regression Results", report = "vc*",
-          digits = 4, float = T, model.names = T)
+          digits = 4, float = T, model.names = F)
 
 #arma(0,0)(0,0)
 stargazer(bw, bv, bn, type = "latex",
           out = "arma00", label = 'arma00', single.row = T,
           title = "ARMA(0,0)(0,0) Estimation Results", report = "vc*",
-          digits = 4, float = T, model.names = T)
+          digits = 4, float = T, model.names = F)
 
 #arima models
 stargazer(arima.weight, arima.volume, arima.number, type = "latex",
           title = "ARMA(p,q)(P,Q) Estimation Results",
           out = "arma", label = "arma", single.row = T, report = "vc*",
-          digits = 4, float = T, model.names = T)
+          digits = 4, float = T, model.names = F)
 
 
 ##RMSE Tables

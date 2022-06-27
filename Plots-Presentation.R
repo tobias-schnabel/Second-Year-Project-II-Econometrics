@@ -1,6 +1,6 @@
 ##Plots
 if (Sys.info()[7] == "ts") {
-  setwd("/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures")
+  setwd("/Users/ts/Dropbox/Apps/Overleaf/SYP II Presentation/Figures")
 }
 
 #make prettier graphs for 2.1
