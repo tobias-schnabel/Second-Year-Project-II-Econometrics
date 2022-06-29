@@ -14,6 +14,7 @@ Paths = c("/Users/ts/Git/Second-Year-Project-II-Econometrics", "C:/Users/obbep/D
 names(Paths) = c("ts", "obbep")
 setwd(Paths[Sys.info()[7]])
 
+ordat = as.data.table(read_excel('Data.xlsx')) 
 #location to cluster
 #issue 1: shipment already at destination
 #drop Lat-Long duplicates
@@ -45,7 +46,7 @@ orex = as_tibble(orwdat) %>%
 
 #grab more than 20
 export1 = orex %>% filter(NumPerDay > 19) %>% 
-  filter(NumPerDay < 30) %>% 
+  filter(NumPerDay < 40) %>% 
   arrange(desc(NumPerDay), Date)
 #get dates
 datelist1 = head(unique(export1$Date), 5)
@@ -79,5 +80,6 @@ SLC = sub("T011.", "", SLC)
 export$SLC = SLC
 
 #export to txt
-write.table(export, file = "Data.txt", sep = " ", 
+print(length(union(datelist1, datelist2)))
+write.table(export, file = "Data.txt", sep = " ",
             row.names = F, col.names = F)
