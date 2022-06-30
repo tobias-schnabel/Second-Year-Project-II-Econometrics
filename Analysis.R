@@ -3,11 +3,12 @@
 rm(list = ls(all = TRUE)) ###CLEAR ALL
 # Package names
 packages <- c("data.table", "dplyr", "zoo", "tidyr", "ggplot2", "ggthemes", 
-              "scales", "strucchange", "readxl", "summarytools", "greybox", 
+               "readxl", "summarytools", "greybox", 
               "ggpubr", "skedastic", "tidyverse", "xtable", "knitr", "tseries",
-              "zoo", "xts", "lmtest", "forecast", "sarima", "astsa", "Metrics",
+              "xts", "lmtest", "forecast", "sarima", "astsa", "Metrics",
               "tsbox", "stargazer", "patchwork", "remotes", "broom", "purrr")
       
+#"scales", "strucchange",
 # package grateful must be installed by hand# install.packages("remotes")
 # remotes::install_github("Pakillo/grateful")
 # Install packages not yet installed
@@ -341,6 +342,8 @@ file.copy('/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/Figures', "/Users/ts/Dr
 knitr::write_bib(c(.packages()),
                  "/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/packages.bib")
 
-# pkgmat = grateful::get_pkgs_info(dependencies = T)[,1:2]
+pkgmat = grateful::get_pkgs_info(dependencies = T)[,1:2]
+print(xtable(pkgmat, caption = "Versions of Packages used in this Report"),
+      file = "/Users/ts/Dropbox/Apps/Overleaf/SYP II Report/versions" )
 
 }
